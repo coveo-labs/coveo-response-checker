@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+  <link rel="stylesheet" href="dependencies/CoveoJsAdmin.min.css">
+  <link rel="stylesheet" href="dependencies/CoveoStyleGuide-2.10.0.css">
+  <link rel="stylesheet" href="css/wheel.css">
+  <link rel="stylesheet" href="css/popup.css">
+
+  <script src="dependencies/jquery-2.2.4.min.js"></script>
+  <script src="dependencies/underscore-1.8.3.min.js"></script>
+  <script src="dependencies/CoveoStyleGuide-2.10.0.js"></script>
+
+  <script src="js/wheel.js"></script>
+  <script src="js/popup.js"></script>
+
+</head>
+
+<body class="CoveoAdminInterface admin coveo-styleguide">
+  <header class="header bg-polygon">
+    <div class="header-section">
+      <a href="http://coveo.com" target="_blank">
+        <div class="admin-logo"></div>
+      </a>
+    </div>
+    <div class="flex-auto"></div>
+    <div class="header-section mod-padded flex flex-center" id="myTitle">Coveo's Response Checker </div>
+  </header>
+  <div class="popup-content">
+    <div style="padding-top:5px;padding-bottom:5px;border-bottom:1px solid #bcc3ca">
+      <button id="download-global" class="btn" title="Download Report"></button>
+      <button id="showInstructions" class="btn">Help</button>
+      <button id="clear" class="btn">RESET</button>
+      <button id="getReport" class="btn">Report</button>
+      <button id="getPerformanceReport" class="btn">Performance</button>
+    </div>
+
+      <div id="instructions">
+      How to use this tool:<br><br>
+      <b>If you want to start all over: hit <b>RESET</b><br>
+      Be-aware that the tracker is kept active. So in order to start fresh: hit RESET<br>
+      <br>
+      <ul>
+        <li>Step  1. Navigate to your Public search page.</li>
+        <li>Step  2. Execute a search in the standalone searchbox.</li>
+        <li>Step  3. When results are displayed. Start typing a query. Hit submit.</li>
+        <li>Step  4. Open or Quickview one of the results.</li>
+        <li>Step  5. Click on Facets to filter data.</li>
+        <li>Step  6. Use as many filters/selections normal behavior.</li>
+        <li>Step  7. Click on <b>Report</b></li>
+      </ul>
+      <br>
+    </div>
+    <div id="loading" class="loading-prompt">
+      <div id="loadTitle">Currently loading. Please wait.</div>
+      <div id="loadSubTitle"></div>
+      <div class="spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
+    </div>
+    <div id="globalReport">
+      <div id="scores"></div>
+      <div id="legend">
+        <table style='padding: 0;'>
+          <tr><td><span style='font-weight:bold;color: #009830'>&#x2605;</span> Mandatory item</td></tr>
+          <tr><td><span style='font-weight:bold;color: #ce3f00'>&#x2605;</span> Mandatory item, FAILED, should be corrected asap !!</td></tr>
+        </table>
+      </div>
+
+      <div id="details"></div>
+    </div>
+
+  </div>
+
+  <div class='toast-container'>
+    <div id="makequery" class="toast mod-error mod-hidden mod-animated">
+      <div class="toast-title">First activate searchtracker and execute at least 1 query!!!</div>
+    </div>
+    <div id="clipboard-copied" class="toast mod-success mod-hidden mod-animated">
+      <div class="toast-title">Copied</div>
+    </div>
+  </div>
+
+
+</body>
+
+</html>

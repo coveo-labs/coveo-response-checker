@@ -1,0 +1,52 @@
+div.wheel {
+  display: inline-block;
+  text-align: center;
+  margin: 5px 10px;
+  cursor: default;
+  width: 130px;
+}
+
+div.wheel svg {
+  cursor: default;
+  width: 80px;
+  height: 80px;
+  transform: rotate(-90deg);
+}
+
+div.wheel .wheel-title {
+  margin-top: 5px;
+  font-size: 1.4em;
+}
+
+div.wheel svg .back-ring {
+  stroke: #E4EAED;
+  fill: none;
+}
+
+div.wheel svg text {
+  font-weight: bold;
+}
+
+div.wheel.good svg text {
+  fill: #009830;
+}
+
+div.wheel.warn svg text {
+  fill: #ecad00;
+}
+
+div.wheel.bad svg text {
+  fill: #ce3f00;
+}
+
+div.wheel.good svg circle.value {
+  stroke: #009830;
+}
+
+div.wheel.warn svg circle.value {
+  stroke: #ecad00;
+}
+
+div.wheel.bad svg circle.value {
+  stroke: #ce3f00;
+}

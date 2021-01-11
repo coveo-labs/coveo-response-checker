@@ -1,0 +1,395 @@
+html {
+  width: 100%;
+  height: 600px;
+}
+
+body {
+  width: 800px;
+  max-width: 800px;
+  height: 600px;
+}
+
+header.header {
+  min-height: 48px;
+}
+
+.btn {
+  margin-left: 2px !important;
+  margin-top: 2px !important;
+ padding: 8.5px 10px;
+}
+
+.progress {
+  position: relative;
+  height: 13px;
+  background: rgb(255, 0, 0);
+  background: -moz-linear-gradient(left, rgba(0, 255, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(0, 255, 0, 1)), color-stop(100%, rgba(255, 0, 0, 1)));
+  background: -webkit-linear-gradient(left, rgba(0, 255, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);
+  background: -o-linear-gradient(left, rgba(0, 255, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);
+  background: -ms-linear-gradient(left, rgba(0, 255, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);
+  background: linear-gradient(to right, rgba(0, 255, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);
+  filter: progid: DXImageTransform.Microsoft.gradient(startColorstr='#00ff00', endColorstr='#ff0000', GradientType=1);
+}
+.amount {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  transition: all 0.8s;
+  background: lightgray;
+  /*width: 0;*/
+}
+.progress:before {
+  content: attr(data-amount)" %";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  text-align: center;
+  line-height: 13px;
+  font-size: 0.8em;
+}
+
+.header-section {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+a {
+  outline: none;
+}
+
+a img {
+  outline: none;
+}
+
+img {
+  border: 0;
+}
+
+a:focus {
+  outline: none;
+}
+
+h4 {
+  font-size: 17px;
+  background-color: lightyellow;
+  font-weight: bold;
+}
+
+h3 {
+  margin: 10px;
+}
+
+h3 i {
+  font-style: italic;
+}
+
+.popup-content {
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 0px;
+  overflow: auto;
+}
+
+#instructions {
+  margin-top: 8px;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+#instructions b {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #1d4f76;
+}
+
+#instructions i {
+  font-style: italic;
+}
+
+#instructions ul {
+  list-style: inherit;
+  padding: 0 10px;
+  margin: 8px 12px;
+}
+#instructions ul li {
+  margin-bottom: 6px;
+}
+
+#myscreenimage {
+  height: 200px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top center;
+  margin: 10px 20px;
+  /*border: 1px solid silver;*/
+}
+
+#scores {
+  text-align: center;
+}
+
+.admin-logo {
+  background-image: url(../images/coveo-cloud.svg);
+  background-position: 10px center;
+  background-size: 165px 37px;
+  background-repeat: no-repeat;
+  min-width: 175px;
+  min-height: 48px;
+  height: 100%;
+}
+
+#scores div.wheel a svg {
+  cursor: pointer;
+}
+
+/* overrides of Vapor styles */
+
+.coveo-styleguide .collapsible .collapsible-header {
+  background-position: left 20px center;
+  display: flex;
+  line-height: 50px;
+  padding: 0 40px;
+}
+
+.coveo-styleguide .collapsible .collapsible-header .msg {
+  flex: 1;
+}
+
+.coveo-styleguide table:not(.datepicker-table) tr:hover td {
+  background-color: transparent;
+}
+
+#details b {
+  font-weight: bold;
+}
+
+#details i {
+  font-style: italic;
+}
+
+
+.mytable {
+  border: none;
+  padding: 5px;
+}
+
+.myexpr {
+  width: 200px;
+}
+
+.myexprval{
+  width: 500px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.myexprcomm{
+  font-style: italic;
+  padding-left: 15px !important;
+}
+
+.mycode {
+  font-family: courier;
+  font-variant: normal !important;
+  font-weight: normal !important;
+  font-size: 11px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.coveo-styleguide ul.collapsible {
+  position: relative;
+}
+
+.coveo-styleguide .collapsible .collapsible-header .details {
+  color: #ce3f00;
+  font-size: 8px;
+}
+
+.coveo-styleguide .collapsible .collapsible-header .result {
+  color: #ce3f00;
+  margin: auto;
+  width: 50px;
+}
+
+.coveo-styleguide .collapsible .collapsible-header .result .wheel {
+  position: relative;
+  width: auto;
+}
+
+.coveo-styleguide .collapsible .collapsible-header .result .wheel svg {
+  width: 40px;
+  position: absolute;
+  margin-top: -40px;
+  margin-left: -10px;
+}
+
+.coveo-styleguide .collapsible .collapsible-header .result div.wheel svg .back-ring {
+  stroke: #fff;
+  fill: none;
+}
+
+.coveo-styleguide .collapsible .collapsible-header .result .wheel-title {
+  display: none;
+}
+
+.coveo-styleguide .collapsible .collapsible-body {
+  /*padding: 0 10px 10px;*/
+  padding: 0;
+}
+
+.coveo-styleguide table:not(.datepicker-table) td.line-result {
+  /*font-variant: small-caps;*/
+  text-align: left;
+  font-weight: bold;
+  vertical-align: top;
+}
+
+.coveo-styleguide table:not(.datepicker-table) th:last-child,
+.coveo-styleguide table:not(.datepicker-table) td:last-child {
+  padding-left: 25px;
+}
+
+tr td.line-message small {
+  font-size: small;
+  color: #1d4f76;
+  display: block;
+  /*padding-left:25px;*/
+}
+
+
+tr td.line-mandatory {
+  text-align: right;
+  width: 48px !important;
+  vertical-align: top !important;
+  /*padding-left: 25px !important;*/
+}
+
+tr td.line-indicator {
+  border-right: none;
+  vertical-align: top !important;
+  /*padding-left: 25px !important;*/
+}
+
+.noborder tr td {
+  border-bottom: 1px solid transparent !important;
+  padding: 1px !important;
+}
+
+.noborder tr{
+  line-height: 12px !important;
+  height: 12px !important;
+}
+
+tr td.line-message {
+  text-align: right;
+  width: 350px;
+  padding-left: 1px !important;
+  vertical-align: top !important;
+}
+
+tr td.line-result {
+  background-position: left 5px top 12px;
+  background-repeat: no-repeat;
+  background-size: 12px;
+  text-align: left;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: break-all;
+  width: 450px;
+  padding-left: 1px !important;
+}
+
+
+tr td.line-performance, tr th.line-performance {
+  text-align: left !important;
+  width: 350px;
+  word-wrap: break-word;
+  word-break: break-all;
+  padding-left: 1px !important;
+}
+
+
+tr td.line-type, tr th.line-type {
+  text-align: left !important;
+  width: 150px;
+  padding-left: 1px !important;
+}
+
+tr td.line-duration, tr th.line-duration {
+  background-position: left 5px top 12px;
+  text-align: right  !important;
+  width: 45px;
+  font-weight: bold;
+  padding-left: 1px !important;
+}
+
+tr td.line-ttfb, tr th.line-ttfb {
+  background-position: left 5px top 12px;
+  text-align: right  !important;
+  width: 45px;
+  padding-left: 1px !important;
+}
+
+.mandatory {
+  color: #009830;
+}
+
+.mandatoryFAIL {
+  color: #ce3f00;
+}
+
+#download-global,
+.copy-section {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 24px;
+  background-image: url(../images/download.svg);
+  cursor: pointer;
+}
+
+#download-global {
+  float: right;
+  min-width: 50px;
+  height: 34px;
+  border-color: transparent;
+}
+
+.copy-section {
+  position: absolute;
+  right: 0;
+  background-image: url(../images/copy.svg);
+  width: 42px;
+  height: 50px;
+  z-index: 2;
+}
+
+.valid-true td.line-result {
+  color: #009830;
+/*  background-image: url(../images/checkbox-checkmark.svg);*/
+}
+
+.valid-false td.line-result {
+  color: #ce3f00;
+  /*background-image: url(../images/action-close.svg);*/
+}
+
+.valid-true td.line-mandatory {
+  color: #009830;
+}
+
+.valid-false td.line-mandatory {
+  color: #ce3f00;
+}
+
+/* Override of admin css */
+
+body.admin {
+  overflow: auto;
+}
