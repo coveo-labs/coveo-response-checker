@@ -61,11 +61,10 @@ class ElementSelector {
 
     for (let i = 0; i < element.attributes.length; i++) {
       let attr = element.attributes[i];
-      // (element.attributes || []).forEach(attr => {
+
       if (!blacklist.includes(attr.nodeName)) {
         result.push(`[${attr.nodeName}="${attr.nodeValue}"]`);
       }
-      // });
     }
 
     return result;
@@ -77,11 +76,9 @@ class ElementSelector {
 
     for (let i = 0; i < element.attributes.length; i++) {
       let attr = element.attributes[i];
-      // element.attributes.forEach(attr => {
       if (!blacklist.includes(attr.nodeName)) {
         attributes[attr.nodeName] = attr.nodeValue;
       }
-      // });
     }
     return attributes;
   }
@@ -119,9 +116,8 @@ class ElementSelector {
   }
 
   testUniqueElementWithinParent(element, selector) {
-    let parent = element.parentNode;
-    let elementList = parent.querySelectorAll(selector);
-    return (elementList.length === 1) && (elementList[0] === element);
+    let elementList = element.parentNode.querySelectorAll(selector);
+    return (elementList.length === 1) && (elementList[0].isSameNode(element));
   }
 
   getAllSelectors(element) {
@@ -224,7 +220,7 @@ class ElementSelector {
     return result;
   }
 
-  getReducedSelector(element) {
+  calculateReducedSelector(element) {
     let result = '';
     const coveoCss = `Breadcrumb
 CardActionBar
@@ -259,6 +255,7 @@ Querybox
 Quickview
 QuickviewDocument
 Recommendation
+Result
 ResultActionsMenu
 ResultAttachments
 ResultFolding
@@ -298,60 +295,95 @@ coveo-facet-value-caption
     while (parents.length) {
       let parent = parents.shift();
       let selectors = this.getAllSelectors(parent);
-      console.log(parent, selectors);
       if (selectors.id) {
         path.unshift(selectors.id);
-        if (this.testSelector(element, path.join(' '))) { return path.join(' '); }
+        if (this.testSelector(element, path.join(' '))) { return path; }
       }
       else {
-        // consider only Coveo classes first
-        let cls = selectors.cls.filter(c => coveoCss.includes(c));
-        if (cls.length) {
-          path.unshift(parent.nodeName + cls.join(''));
-          if (this.testSelector(element, path.join(' '))) { return path.join(' '); }
+        // try out these attributes:
+        let attrs = 'data-id,data-field,data-value,data-caption,data-original-value,aria-label,caption,href,title'.split(',');
+        let attributsPath = [];
+
+        for (let i = 0; i < attrs.length; i++) {
+          let attr = attrs[i];
+          if (selectors.attributes[attr]) {
+            let attributExpression = `${parent.classList.length ? '.' + parent.classList[0] : parent.nodeName}[${attr}="${selectors.attributes[attr]}"]`;
+            attributsPath.push(attributExpression)
+            if (this.testSelector(element, `${attributExpression} ` + path.join(' '))) { return [attributExpression, ...path]; }
+            break;
+          }
+        }
+
+        if (attributsPath.length) {
+          path.unshift(attributsPath.join(''));
+          if (this.testSelector(element, path.join(' '))) { return path; }
         }
         else {
-          // try out all classes
-          let cls = selectors.cls;
+          // consider only Coveo classes first
+          let cls = selectors.cls.filter(c => coveoCss.includes(c));
           if (cls.length) {
-            path.unshift(parent.nodeName + cls.join(''));
-            if (this.testSelector(element, path.join(' '))) { return path.join(' '); }
+            path.unshift(cls.join(''));
+            if (this.testSelector(element, path.join(' '))) { return path; }
           }
           else {
-            // try out these attributes:
-            let attrs = 'data-id,data-field,data-value,data-original-value,aria-label,caption,href,title'.split(',');
-            let attributsPath = [];
-            // attrs.forEach(attr => {
-            for (let i = 0; i < attrs.length; i++) {
-              let attr = attrs[i];
-              if (selectors.attributes[attr]) {
-                let attributExpression = `[${attr}="${selectors.attributes[attr]}"]`;
-                attributsPath.push(attributExpression)
-                if (this.testSelector(element, `${parent.nodeName}${attributExpression} ` + path.join(' '))) { return `${parent.nodeName}${attributExpression} ` + path.join(' '); }
-                break;
-              }
+            // try out all classes
+            let cls = selectors.cls;
+            if (cls.length) {
+              path.unshift(cls.join(''));
+              if (this.testSelector(element, path.join(' '))) { return path; }
             }
-            // });
-
-            if (attributsPath.length) {
-              path.unshift(parent.nodeName + attributsPath.join(''));
-              if (this.testSelector(element, path.join(' '))) { return path.join(' '); }
+            else {
+              path.unshift(parent.nodeName);
             }
           }
+        }
+      }
+
+      if (path.length) {
+        // check if need position
+        let elementList = parent.parentNode.querySelectorAll(path.join(' '));
+        if (!((elementList.length === 1) && elementList[0].isSameNode(element))) {
+          let previousPath = path.shift();
+          path.unshift(previousPath + selectors.nth);
         }
       }
 
     }
 
-    return path.join(' ');
+    return path;
+  }
+
+  getReducedSelector(element) {
+    let path = this.calculateReducedSelector(element);
+    // try to reduce more by removing rules that don't have an impact
+    let selectors = [...path];
+    let idx = 1;
+
+    while (idx < selectors.length) {
+      let selectorsReduced = [...selectors];
+
+      let selectorToReject = selectorsReduced.splice(idx, 1)[0];
+      if (selectorToReject.includes('.Coveo')) {
+        // keep the selectors with .CoveoX for clarity
+        idx++;
+        continue;
+      }
+
+      if (this.testSelector(element, selectorsReduced.join(' '))) {
+        // still good, update
+        selectors = selectorsReduced;
+      }
+      else {
+        idx++;
+      }
+    }
+
+    return selectors.join(' ');
   }
 
   toString() {
     let defaultSelector = this.getQuerySelector(this.element);
     let reducedSelector = this.getReducedSelector(this.element);
-
-    console.log('D:', defaultSelector);
-    console.log('R:', reducedSelector);
 
     return this.testSelector(this.element, reducedSelector) ? reducedSelector : defaultSelector;
   }
