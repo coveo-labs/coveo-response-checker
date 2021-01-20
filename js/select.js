@@ -217,6 +217,13 @@ class ElementSelector {
         return result;
       }*/
     }
+
+    //Find the first ID and use that
+    let last = result.lastIndexOf("#");
+    if (last != -1) {
+      result = result.substring(last);
+    }
+
     return result;
   }
 
