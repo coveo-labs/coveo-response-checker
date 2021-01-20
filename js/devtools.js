@@ -1,0 +1,1 @@
+chrome.devtools.panels.create("Coveo Response Checker", '/images/coveo.png', "devpanel.html", null);

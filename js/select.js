@@ -216,6 +216,11 @@ function getQuerySelector(element) {
       return result;
     }*/
   }
+  //Find the first ID and use that
+  var last = result.lastIndexOf("#");
+  if (last!=-1) {
+     result = result.substring(last);
+  }
   return result;
   //return null;
 };
@@ -234,4 +239,3 @@ function getQuerySelector3(element) {
     return segs(element).join('/');
 
 }
-

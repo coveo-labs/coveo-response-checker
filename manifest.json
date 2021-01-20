@@ -6,18 +6,18 @@
 	"description": "A Chrome extension to check the responses sent to the Coveo Organization.",
 
 	"icons": {
-		"16": "images/16.png",
-		"48": "images/48.png",
-		"128": "images/128.png"
+		"16": "images/80 B rounded square.png",
+		"48": "images/120 B rounded square.png",
+		"128": "images/180 B rounded square.png"
 	},
 	"background": {
 		"scripts": ["js/background.js"]
 	},
 	"browser_action": {
-		"default_icon": "/images/inspectGoodC.png",
-		"default_popup2": "/popup.html"
+		"default_icon": "/images/80 B rounded square.png",
+		"default_popup": "/popup.html"
 	},
-
+  "devtools_page": "devtools.html",
 	"content_scripts": [{
 		"run_at": "document_end",
 		"matches": [
@@ -33,7 +33,6 @@
 	}],
 	"permissions": [
 		"activeTab",
-		"tabs",
 		"webRequest",
 		"webRequestBlocking",
     "*://*/"
