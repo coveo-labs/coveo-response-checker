@@ -51,11 +51,15 @@ function pad(t) {
 let defaultECResults= ['add','remove','detail','pageview','impression','click','purchase'];
 
 //For search and plan
+//t ==> for Totals
+//m ==> Mandatory
+//p ==> persistent during session
+//pp ==> persistent during page view
 let searchChecks = [
   { key: 'usingSearchHub', t:true, m:true, url: '', prop: 'searchHub' , value: {test: val => (val !== '') }},
   { key: 'usingTab', t:true, m:true, url: '', prop: 'tab' , check: {test: vals => (vals['recommendation']==undefined || vals['recommendation']=='')}, value: {test: val => (val !== '') }},
   { key: 'usingLocale', t:true, m:true, url: '', prop: 'locale' , value: {test: val => (val !== '') }},
-  { key: 'usingVisitorId', t:true, m:true, url: '', prop: 'visitorId' , value: {test: val => (val !== '') }},
+  { key: 'usingVisitorId', p:true, t:true, m:true, url: '', prop: 'visitorId' , value: {test: val => (val !== '') }},
   { key: 'usingPipeline', t:true, url: '', prop: 'pipeline' , value: {test: val => (val !== '') }},
   { key: 'usingContext', t:true, url: '', prop: 'context' , value: {test: val => (val !== '') }},
   { key: 'NOT_usingDQ', t:true, url: '', prop: 'dq' , default:false, value: {test: val => (val == '') }},
@@ -71,7 +75,7 @@ let searchChecks = [
 //For QuerySuggest
 let qsChecks = [
   { key: 'usingSearchHubQS', t:true, m:true, url: '', prop: 'searchHub' , value: {test: val => (val !== '') }},
-  { key: 'usingVisitorIdQS', t:true, m:true, url: '', prop: 'visitorId' , value: {test: val => (val !== '') }},
+  { key: 'usingVisitorIdQS',  p:true, t:true, m:true, url: '', prop: 'visitorId' , value: {test: val => (val !== '') }},
   { key: 'usingTabQS', t:true,  url: '', prop: 'tab' , value: {test: val => (val !== '') }},
   { key: 'usingPipelineQS', t:true, url: '', prop: 'pipeline' , value: {test: val => (val !== '') }},
   { key: 'usingContextQS', t:true, url: '', prop: 'context' , value: {test: val => (val !== '') }},
@@ -85,8 +89,8 @@ let ecChecks = [
   { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,key: 'usingDL', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'dl' , value: {test: val => (val.match(/^https?:\/\/.+/i)?true:false) }},
   { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,key: 'usingDR', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'dr' , value: {test: val => (val.match(/^https?:\/\/.+/i)?true:false) }},
   { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,key: 'usingDT', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'dt' , value: {test: val => (val !== '') }},
-  { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,key: 'usingPID', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'pid' , value: {test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i)?true:false) }},
-  { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,key: 'usingCID', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'cid' , value: {test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i)?true:false) }},
+  { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,p:true,pp:true,key: 'usingPID', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'pid' , value: {test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i)?true:false) }},
+  { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,p:true,key: 'usingCID', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'cid' , value: {test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i)?true:false) }},
   { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,key: 'usingCU', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'cu' , value: {test: val => (val !== '') }},
   { ectitle: {test: vals => (vals['pa'] || vals['t'])}, m:true,key: 'usingUL', url: '/collect', check: {test: vals => (['impression','click','purchase','add','remove','detail'].includes(vals['pa']) || ['pageview'].includes(vals['t']) )}, prop: 'ul' , value: {test: val => (val !== '') }},
   { ectitle: {test: vals => (vals['pa'])}, m:true,key: 'usingPR1ID', url: '/collect', check: {test: vals => (['click','add','remove','detail'].includes(vals['pa']) )}, prop: 'pr1id' , value: {test: val => (val !== '') }},
@@ -108,7 +112,7 @@ let ecChecks = [
 //For Analytics
 let analyticChecks = [
 
-  { title: 'Click/Open', t:true, m:true, key: 'usingVisitorA', url: '/click', prop: 'visitor' , value: {test: val => (val !== '') }},
+  { title: 'Click/Open', t:true, m:true,p:true, key: 'usingVisitorA', url: '/click', prop: 'visitor' , value: {test: val => (val !== '') }},
   { title: 'Click/Open', t:true, m:true,key: 'actionCause', url: '/click', prop: 'actionCause', value: {test: val => (val == 'documentquickview' || val == 'documentopen' || val =='recommendationopen' ) }}, 
   { title: 'Click/Open', t:true, m:true,key: 'documentUri', url: '/click', prop: 'documentUri', value: {test: val => (val !== '') }},
   { title: 'Click/Open', t:true, m:true,key: 'documentPosition', url: '/click', prop: 'documentPosition', value: {test: val => (val >= 1) }},
@@ -131,14 +135,14 @@ let analyticChecks = [
   { title: 'PageView', t:true, m:true, key: 'pageViews_contentIdValue', url: '/view', prop: 'contentIdValue', value: {test: val => (val !== '') }},
   { title: 'PageView', t:true, m:true, key: 'pageViews_language', url: '/view', prop: 'language', value: {test: val => (val !== '') }},
   { title: 'PageView', t:true, key: 'outcome', url: '/view', prop: 'outcome' , value: {test: val => (val !== '') }},
-  { title: 'PageView', t:true, key: 'usingVisitorA', m:false,url: '/view', prop: 'visitor' , value: {test: val => (val !== '') }},
+  { title: 'PageView', t:true, p:true,key: 'usingVisitorA', m:false,url: '/view', prop: 'visitor' , value: {test: val => (val !== '') }},
 
 
   { title: 'Search', t:true, m:true,key: 'usingSearchHubA', url: '/search', prop: 'originLevel1' , value: {test: val => (val !== '') }},
   { title: 'Search', t:true, key: 'usingTabA', m:true,url: '/search', prop: 'originLevel2' , value: {test: val => (val !== '') }},
   { title: 'Search', t:true, key: 'actionCause', m:true,url: '/search', prop: 'actionCause' , value: {test: val => (val !== '') }},
   { title: 'Search', t:true, key: 'usingLocaleA', m:true,url: '/search', prop: 'language' , value: {test: val => (val !== '') }},
-  { title: 'Search', t:true, key: 'usingVisitorA', m:true,url: '/search', prop: 'visitor' , value: {test: val => (val !== '') }},
+  { title: 'Search', t:true, p:true,key: 'usingVisitorA', m:true,url: '/search', prop: 'visitor' , value: {test: val => (val !== '') }},
   { title: 'Search', t:true, key: 'queryText', m:true,url: '/search', prop: 'queryText' , check: {test: vals => ((vals['recommendation']!='' && vals['recommendation']!=undefined) || (vals['actionCause']!='interfaceLoad' && vals['actionCause']!='recommendationInterfaceLoad'))}, value: {test: val => (val !== '') }},
   { title: 'Search', t:true, key: 'userAgentA', m:true,url: '/search', prop: 'userAgent' , value: {test: val => (val !== '') }},
   { title: 'Search', t:true, key: 'searchQueryUidA', m:true,url: '/search', prop: 'searchQueryUid', value: {test: val => (val !== '') }},
@@ -386,6 +390,24 @@ function processUpdate(state) {
   //state.record =  testcase_items;
 }
 
+function resetPPCheck(state, checks) {
+  checks.map(check => {
+    if (check.pp != undefined){
+      if (check.pp) {
+        //Reset to initial value
+        check.persistent = undefined;
+      }
+    }
+  });
+
+}
+function resetPP(state) {
+  resetPPCheck(state,searchChecks);
+  resetPPCheck(state,qsChecks);
+  resetPPCheck(state,analyticChecks);
+  resetPPCheck(state,ecChecks);
+}
+
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   //console.log(msg.action);
   if (msg.type === 'getState') {
@@ -410,6 +432,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     getTabId_Then(tabId => {
       getState_Then(state => {
         state.document_url = msg.url;
+        //Reset the pp values in the checks
+        resetPP(state);
         saveState(state, tabId);
       });
     });
@@ -804,6 +828,7 @@ let doChecks = function(postedString, url, checks, state, report,reportindicator
       let isValid = false;
       let isValidSingle = false;
       let value = '';
+      let persistent = '';
       let title='';
       let go = true;
       let mandatory = false;
@@ -886,6 +911,30 @@ let doChecks = function(postedString, url, checks, state, report,reportindicator
           isValidSingle = isValid;
         }
       }
+      //Validate persistency
+      if (check.p != undefined) {
+        let persist = true;
+        if (check.p) {
+          if (check.persistent == undefined)
+          {
+            //Empty persistent value, so must be first one in
+            check.persistent = value;
+            persist= true;
+          } else {
+            //We have a previous value
+            if (check.persistent != value) {
+               persist = false;
+               let pages = 'during session.';
+               if (check.pp!=undefined) {
+                 if (check.pp) {
+                     pages ='during a page visit.';
+                 }
+               }
+               persistent = `Value should be persistent ${pages}<br>Old: ${check.persistent} <> New: ${value}`;
+            }
+          }
+        }
+      }
     }
       //Check if we have a valid check in the state
       //first get the old value of the state
@@ -903,23 +952,23 @@ let doChecks = function(postedString, url, checks, state, report,reportindicator
       //}
       //We need to save the ecResults
       if (go) {
-      if (title!='')  {
-        if (state.ecResults[title]==undefined) {
-          state.ecResults[title]={};
+        if (title!='')  {
+          if (state.ecResults[title]==undefined) {
+            state.ecResults[title]={};
+          }
+          if (first) {
+            let current = state.ecResults[title]['Count'];
+            if (current==undefined) current = 0;
+            state.ecResults[title]['Count'] = current +1;
+            first = false;
+          }
+          curtitle=title;
+          state.ecResults[title][check.key] = isValid;
+          curcontentfordev += `<li class='${(isValidSingle && persistent=='')?"validInd":"notvalidInd"}${mandatory?" ":" notmandatory"}'>${check.prop}<span class='propvalue'>${curvalue}${def_value==false?"(should be false or empty)":""}</span>${(persistent=="")?"":"<span class=persistent>${persistent}</span>"}</li>`;
+          if (!isValid && mandatory) oneisbad = true;
+          if (!isValidSingle && mandatory) oneisbadSingle = true;
         }
-        if (first) {
-          let current = state.ecResults[title]['Count'];
-          if (current==undefined) current = 0;
-          state.ecResults[title]['Count'] = current +1;
-          first = false;
-        }
-        curtitle=title;
-        state.ecResults[title][check.key] = isValid;
-        curcontentfordev += `<li class='${isValidSingle?"validInd":"notvalidInd"}${mandatory?" ":" notmandatory"}'>${check.prop}<span class='propvalue'>${curvalue}${def_value==false?"(should be false or empty)":""}</span></li>`;
-        if (!isValid && mandatory) oneisbad = true;
-        if (!isValidSingle && mandatory) oneisbadSingle = true;
       }
-    }
       //If key is not in state, give warning
       if (title=='') {
         state[check.key] = isValid;
@@ -942,11 +991,11 @@ let doChecks = function(postedString, url, checks, state, report,reportindicator
           ctitle = check.title+' - '+(check.t?check.prop:check.key);
         } else {
           ctitle = check.t?check.prop:check.key;
-          curcontent+= `<td class='${isValid?"valid":"notvalid"}${mandatory?" ":" notmandatory"}'></td><td>${check.key}</td><td>${value}${def_value==false?"(should be false or empty)":""}</td>`;   
+          //curcontent+= `<td class='${isValid?"valid":"notvalid"}${mandatory?" ":" notmandatory"}'></td><td>${check.key}</td><td>${value}${def_value==false?"(should be false or empty)":""}</td>`;   
         }
         
-        content+= `<tr><td class='${isValid?"valid":"notvalid"}${mandatory?" ":" notmandatory"}'></td><td>${ctitle}</td><td>${value}${def_value==false?"(should be false or empty)":""}</td></tr>`;
-        if (check.t && go) curcontentfordev += `<li class='${isValidSingle?"validInd":"notvalidInd"}${mandatory?" ":" notmandatory"}'>${check.prop}<span class='propvalue'>${curvalue}${def_value==false?"(should be false or empty)":""}</span></li>`;
+        content+= `<tr><td class='${(isValid && persistent=='')?"valid":"notvalid"}${mandatory?" ":" notmandatory"}'></td><td>${ctitle}</td><td>${value}${def_value==false?"(should be false or empty)":""}${(persistent=="")?"":"<span class=persistent>${persistent}</span>"}</td></tr>`;
+        if (check.t && go) curcontentfordev += `<li class='${(isValidSingle && persistent=='')?"validInd":"notvalidInd"}${mandatory?" ":" notmandatory"}'>${check.prop}<span class='propvalue'>${curvalue}${def_value==false?"(should be false or empty)":""}</span>${(persistent=="")?"":"<span class=persistent>${persistent}</span>"}</li>`;
         //curcontentfordev += `<li class='${isValidSingle?"validInd":"notvalidInd"}${mandatory?" ":" notmandatory"}'>${ctitle} (${value})</li>`;
 
       } /*else {
@@ -1087,8 +1136,8 @@ let addEcResults = function (state) {
 
 let onAnalyticsRequest = function (details) {
   if (details.method=="OPTIONS") return;
-  //We do not want to track Google GTM events
-  if (details.url.startsWith('https://www.google-analytics')) return;
+  //We do not want to track Google GTM events were pa is not in there l&pa=detail&
+  if (details.url.startsWith('https://www.google-analytics') && details.url.indexOf('&pa=detail&')==-1) return;
   getState_Then(state => {
     if (!state.enabledSearch) return;
     if (details.statusCode) {
@@ -1235,7 +1284,7 @@ let onAnalyticsRequest = function (details) {
 
     //Do nothing if raw==undefined and Object.keys(formData).length==0
     //Data will come in through the beacon event
-    if (raw==undefined && Object.keys(formData).length==0 /* && Object.keys(events).length<5*/) {
+    if (raw==undefined && Object.keys(formData).length==0 && Object.keys(events).length<5) {
       console.log('POST: EMPTY BEACON');
       //We need this for our beacon POST
       return;
@@ -1256,9 +1305,9 @@ let onAnalyticsRequest = function (details) {
       if (content.content!='') {
         state.ecommerceRequests.unshift({url:details.url});
         let type = 'E Commerce';
-        /*if (details.url.startsWith('https://www.google-analytics')) {
+        if (details.url.startsWith('https://www.google-analytics')) {
           type += ' (Google GTM)';
-        }*/
+        }
         let rec = {type:'EC',time:getTime(), req:details.requestId,data:content, title: content.title, request: {type:type,url:details.url, data:postedString} };
         state.dev.unshift(rec);
         //not now, later when response is received. if (state.devconnection!='') state.devconnection.postMessage(rec);
