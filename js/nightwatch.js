@@ -35,8 +35,8 @@ EventTypes.MouseDrag = 21;
 EventTypes.MouseDrop = 22;
 EventTypes.KeyPress = 23;
 
-function NightwatchRenderer(document) {
-  this.document = document;
+function NightwatchRenderer() {
+  this.document = '';
   this.title = "Testcase";
   this.items = null;
   this.history = [];
@@ -47,21 +47,25 @@ function NightwatchRenderer(document) {
 
 NightwatchRenderer.prototype.text = function(txt) {
   // todo: long lines
-  this.document.writeln(txt);
+  //this.document.writeln(txt);
+  this.document += txt+'\n';
 };
 
 NightwatchRenderer.prototype.stmt = function(text, indent) {
   if (indent == undefined) indent = 1;
   var output = new Array(2 * indent).join(" ") + text;
-  this.document.writeln(output);
+  //this.document.writeln(output);
+  this.document += output+'\n';
 };
 
 NightwatchRenderer.prototype.cont = function(text) {
-  this.document.writeln("    ... " + text);
+  //this.document.writeln("    ... " + text);
+  this.document += "    ... " + text+'\n';
 };
 
 NightwatchRenderer.prototype.pyout = function(text) {
-  this.document.writeln("    " + text);
+  //this.document.writeln("    " + text);
+  this.document += "    " + text+'\n';
 };
 
 NightwatchRenderer.prototype.pyrepr = function(text, escape) {
@@ -72,7 +76,8 @@ NightwatchRenderer.prototype.pyrepr = function(text, escape) {
 };
 
 NightwatchRenderer.prototype.space = function() {
-  this.document.write("\n");
+  //this.document.write("\n");
+  this.document += '\n';
 };
 
 NightwatchRenderer.prototype.regexp_escape = function(text) {
@@ -129,11 +134,12 @@ NightwatchRenderer.prototype.dispatch = d;
 
 var cc = EventTypes;
 
-NightwatchRenderer.prototype.render = function(with_xy) {
+NightwatchRenderer.prototype.render = function(with_xy, tests) {
   this.with_xy = with_xy;
   var etypes = EventTypes;
-  this.document.open();
-  this.document.write("<" + "pre" + ">");
+  //this.document.open();
+  //this.document.write("<" + "pre" + ">");
+  this.document+="<" + "pre" + " class=mycode id='NightwatchCode' >";
   this.writeHeader();
   var last_down = null;
   let last_up=null;
@@ -153,7 +159,7 @@ NightwatchRenderer.prototype.render = function(with_xy) {
         continue;
       }
     }
-    this.stmt("//"+JSON.stringify(item));
+    //this.stmt("//"+JSON.stringify(item));
     // remember last MouseDown to identify drag
     if (item.type == etypes.MouseDown) {
       last_down = this.items[i];
@@ -253,8 +259,10 @@ NightwatchRenderer.prototype.render = function(with_xy) {
     if (item.type == etypes.Comment) this.space();
   }
   this.writeFooter();
-  this.document.write("<" + "/" + "pre" + ">");
-  this.document.close();
+  //this.document.write("<" + "/" + "pre" + ">");
+  this.document+="<" + "/" + "pre" + ">";
+  //this.document.close();
+  return this.document;
 };
 
 NightwatchRenderer.prototype.writeHeader = function() {
@@ -269,15 +277,30 @@ NightwatchRenderer.prototype.writeHeader = function() {
     0
   );
   this.space();
+  this.stmt('const fs = require("fs");',0);
   this.stmt("var DEFAULT_TIMEOUT = 5000;",0);
   this.stmt("module.exports = {", 0);
   //this.stmt("'test case': function(client) {", 1);
   this.stmt("'test case': async function(client) {", 1);
+
   this.stmt("let mypage = client.page.Coveo();",2);
-  this.stmt('await mypage.setPause(1000);',2);
+  this.stmt('await mypage.setPause(2000);',2);
   //this.stmt("return client", 2);
 };
 NightwatchRenderer.prototype.writeFooter = function() {
+  this.stmt(`
+  client.execute('return window.events', (result) => {
+    console.log(result.value);
+    for (var i = 0; i < result.value.length; i++) {
+      let traffic = result.value[i];
+      //console.log(traffic);
+      let json = JSON.parse(traffic);
+      console.log("type:" + json.type);
+      console.log("url:" + json.url);
+      console.log("data: " + json.obj);
+    }
+    //console.log(result);
+  });`,1);
   this.space();
   this.stmt("}", 1);
   this.stmt("};", 0);
@@ -297,6 +320,9 @@ NightwatchRenderer.prototype.startUrl = function(item) {
   this.stmt("client.resizeWindow(" + item.width + ", " + item.height + ");", 3);
   this.stmt("client.url(" + url + ");", 3);
   this.stmt("client.pause(DEFAULT_TIMEOUT);",3);
+  this.stmt('await client.execute(fs.readFileSync("src/ajaxListener.js").toString());',2);
+  this.stmt("client.pause(DEFAULT_TIMEOUT);",3);
+
 };
 
 NightwatchRenderer.prototype.openUrl = function(item) {
@@ -622,7 +648,7 @@ NightwatchRenderer.prototype.waitAndTestSelector = function(
   xpathSelector && this.stmt(".useCss()");
 };
 
-var dt = new NightwatchRenderer(document);
+/*var dt = new NightwatchRenderer(document);
 window.onload = function onpageload() {
   var with_xy = false;
   if (window.location.search == "?xy=true") {
@@ -632,4 +658,4 @@ window.onload = function onpageload() {
     dt.items = response.items;
     dt.render(with_xy);
   });
-};
+};*/

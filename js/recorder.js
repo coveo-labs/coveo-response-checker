@@ -229,17 +229,17 @@ TestRecorder.TestCase = function () {
 
 TestRecorder.TestCase.prototype.append = function (o) {
   //Check if proper stuff is available
-  console.log('Selector: appended1 => ' + JSON.stringify(o));
+  //console.log('Selector: appended1 => '+JSON.stringify(o));
   if (o.info != undefined) {
     if (o.info.selector != undefined) {
       //if (o.info.selector =="" && o.info.id=="") return;
     }
+    this.items[this.items.length] = o;
+    try {
+      //console.log('Selector: appended => '+JSON.stringify(o));
+    } catch (e) { }
+    chrome.runtime.sendMessage({ action: "append", obj: o });
   }
-  this.items[this.items.length] = o;
-  try {
-    console.log('Selector: appended => ' + JSON.stringify(o));
-  } catch (e) { }
-  chrome.runtime.sendMessage({ action: "append", obj: o });
 };
 
 TestRecorder.TestCase.prototype.peek = function () {
@@ -1050,6 +1050,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     sendResponse({});
   }
   if (request.action == "open") {
+    console.log('Got OPEN: ' + request.url);
     recorder.open(request.url);
     sendResponse({});
   }
@@ -1057,11 +1058,18 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     recorder.addComment(request.text);
     sendResponse({});
   }
+  return true;
 });
 
 //get current status from background
-chrome.runtime.sendMessage({ action: "get_status" }, function (response) {
-  if (response.active) {
-    recorder.start();
+chrome.runtime.sendMessage({ action: "get_status" });
+
+
+chrome.runtime.onMessage.addListener(function (request, sender, response) {
+  if (request.action === 'sent_status') {
+    if (request.active) {
+      recorder.start();
+    }
   }
+  return true;
 });

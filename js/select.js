@@ -389,4 +389,3 @@ coveo-facet-value-caption
   }
 
 }
-
