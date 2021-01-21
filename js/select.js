@@ -392,6 +392,9 @@ coveo-facet-value-caption
     let defaultSelector = this.getQuerySelector(this.element);
     let reducedSelector = this.getReducedSelector(this.element);
 
+    console.log('D:', defaultSelector);
+    console.log('R:', reducedSelector);
+
     return this.testSelector(this.element, reducedSelector) ? reducedSelector : defaultSelector;
   }
 

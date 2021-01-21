@@ -234,12 +234,12 @@ TestRecorder.TestCase.prototype.append = function (o) {
     if (o.info.selector != undefined) {
       //if (o.info.selector =="" && o.info.id=="") return;
     }
-    this.items[this.items.length] = o;
-    try {
-      //console.log('Selector: appended => '+JSON.stringify(o));
-    } catch (e) { }
-    chrome.runtime.sendMessage({ action: "append", obj: o });
   }
+  this.items[this.items.length] = o;
+  try {
+    //console.log('Selector: appended => '+JSON.stringify(o));
+  } catch (e) { }
+  chrome.runtime.sendMessage({ action: "append", obj: o });
 };
 
 TestRecorder.TestCase.prototype.peek = function () {
@@ -362,12 +362,13 @@ TestRecorder.ElementInfo.prototype.getCleanCSSSelector = function (element) {
 
   let selector = element.id;
   try {
-    selector = getQuerySelector(element);
+    selector = new ElementSelector(element).toString();
   }
-  catch (e) { }
+  catch (e) {
+    console.warn(e);
+  }
   console.log('Selector: ', selector);
   return selector;
-
 };
 
 TestRecorder.DocumentEvent = function (type, target) {
@@ -934,7 +935,7 @@ TestRecorder.Recorder.prototype.ondrag = function (e) {
 TestRecorder.Recorder.prototype.onmousedown = function (e) {
   //if (!contextmenu.visible) {
   var e = new TestRecorder.Event(e);
-  console.log('Selector: onmousedown => ' + JSON.stringify(e));
+  console.log('Selector: onmousedown => ', e);
   if (e.button() == TestRecorder.Event.LeftButton) {
     recorder.testcase.append(
       new TestRecorder.MouseEvent(
@@ -950,7 +951,7 @@ TestRecorder.Recorder.prototype.onmousedown = function (e) {
 TestRecorder.Recorder.prototype.onmouseup = function (e) {
   //if (!contextmenu.visible) {
   var e = new TestRecorder.Event(e);
-  console.log('Selector: onmouseup => ' + JSON.stringify(e));
+  console.log('Selector: onmouseup => ', e);
   if (e.button() == TestRecorder.Event.LeftButton) {
     recorder.testcase.append(
       new TestRecorder.MouseEvent(
@@ -973,7 +974,7 @@ TestRecorder.Recorder.prototype.onmouseup = function (e) {
 
 TestRecorder.Recorder.prototype.onclick = function (e) {
   var e = new TestRecorder.Event(e);
-  console.log('Selector: onclick => ' + JSON.stringify(e));
+  console.log('Selector: onclick => ', e);
   if (e.shiftkey()) {
     recorder.check(e);
     e.stopPropagation();
@@ -1050,7 +1051,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     sendResponse({});
   }
   if (request.action == "open") {
-    console.log('Got OPEN: ' + request.url);
+    console.log('Got OPEN: ', request.url);
     recorder.open(request.url);
     sendResponse({});
   }
