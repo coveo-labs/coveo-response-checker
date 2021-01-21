@@ -315,25 +315,22 @@ TestRecorder.ElementInfo = function (element) {
 };
 
 TestRecorder.ElementInfo.prototype.findLabelText = function (element) {
-  var label = this.findContainingLabel(element);
-  var text;
+  let label = this.findContainingLabel(element);
+  let text;
   if (!label) {
     label = this.findReferencingLabel(element);
   }
   if (label) {
     text = label.innerHTML;
     // remove newlines
-    text = text.replace("\n", " ");
+    text = text.replace(/\n/g, " ");
     // remove tags
-    text = text.replace(/<[^>]*>/g, " ");
+    text = text.replace(/<[^>]*?>/g, " ");
     // remove non-alphanumeric prefixes or suffixes
     text = text.replace(/^\W*/gm, "");
     text = text.replace(/\W*$/gm, "");
     // remove extra whitespace
-    text = text
-      .replace(/^\s*/, "")
-      .replace(/\s*$/, "")
-      .replace(/\s+/g, " ");
+    text = text.trim().replace(/\s+/g, " ");
   }
 
   return text;
@@ -361,12 +358,7 @@ TestRecorder.ElementInfo.prototype.getCleanCSSSelector = function (element) {
   if (!element) return;
 
   let selector = element.id;
-  try {
-    selector = new ElementSelector(element).toString();
-  }
-  catch (e) {
-    console.warn(e);
-  }
+  selector = new ElementSelector(element).toString();
   console.log('Selector: ', selector);
   return selector;
 };

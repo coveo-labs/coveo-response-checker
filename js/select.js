@@ -1,5 +1,70 @@
 "use strict";
 
+const COVEO_CSS_CLASSES = `Breadcrumb
+CardActionBar
+CardOverlay
+CategoryFacet
+DidYouMean
+DynamicFacet
+DynamicFacetRange
+DynamicHierarchicalFacet
+Excerpt
+Facet
+FacetRange
+FacetSlider
+FacetValueSuggestions
+FieldSuggestions
+FieldTable
+FieldValue
+HierarchicalFacet
+Icon
+ImageFieldValue
+Matrix
+MissingTerms
+Omnibox
+OmniboxResultList
+Pager
+PreferencesPanel
+PromotedResultsBadge
+QueryDuration
+QuerySuggestPreview
+QuerySummary
+Querybox
+Quickview
+QuickviewDocument
+Recommendation
+Result
+ResultActionsMenu
+ResultAttachments
+ResultFolding
+ResultLayoutSelector
+ResultLink
+ResultList
+ResultRating
+ResultTagging
+ResultsFiltersPreferences
+ResultsPerPage
+ResultsPreferences
+SearchAlerts
+SearchAlertsMessage
+SearchButton
+SearchInterface
+Searchbox
+Settings
+ShareQuery
+SimpleFilter
+Sort
+SortDropdown
+StarRating
+Tab
+TemplateLoader
+Text
+Thumbnail
+TimespanFacet
+coveo-facet-header
+coveo-facet-value-caption`.split('\n').map(c => `.Coveo${c}`);
+
+
 class ElementSelector {
   constructor(element) {
     this.element = element;
@@ -35,7 +100,7 @@ class ElementSelector {
     if (/^\d/.test(id)) {
       return false;
     }
-    return document.querySelectorAll("#" + id).length === 1;
+    return this.element.ownerDocument.querySelectorAll("#" + id).length === 1;
   }
 
   getIdSelector(element) {
@@ -116,7 +181,9 @@ class ElementSelector {
   }
 
   testUniqueElementWithinParent(element, selector) {
-    let elementList = element.parentNode.querySelectorAll(selector);
+    let parent = element.parentNode || element.ownerDocument;
+    // console.log('testUniqueElementWithinParent: ', parent);
+    let elementList = parent.querySelectorAll(selector);
     return (elementList.length === 1) && (elementList[0].isSameNode(element));
   }
 
@@ -131,29 +198,29 @@ class ElementSelector {
     };
   }
 
-  reduceSelector(selectors, element) {
-    if (selectors.id != null) {
-      return selectors.id;
-    }
+  // reduceSelector(selectors, element) {
+  //   if (selectors.id != null) {
+  //     return selectors.id;
+  //   }
 
-    if (this.testUniqueElementWithinParent(element, selectors.tag)) {
-      return selectors.tag;
-    }
+  //   if (this.testUniqueElementWithinParent(element, selectors.tag)) {
+  //     return selectors.tag;
+  //   }
 
-    if (selectors.cls.length !== 0) {
-      let allClasses = selectors.cls.join('');
-      let selector = allClasses;
-      if (this.testUniqueElementWithinParent(element, selector)) {
-        return selector;
-      }
-      selector = selectors.tag + allClasses;
-      if (this.testUniqueElementWithinParent(element, selector)) {
-        return selector;
-      }
-    }
+  //   if (selectors.cls.length !== 0) {
+  //     let allClasses = selectors.cls.join('');
+  //     let selector = allClasses;
+  //     if (this.testUniqueElementWithinParent(element, selector)) {
+  //       return selector;
+  //     }
+  //     selector = selectors.tag + allClasses;
+  //     if (this.testUniqueElementWithinParent(element, selector)) {
+  //       return selector;
+  //     }
+  //   }
 
-    return selectors.nth;
-  }
+  //   return selectors.nth;
+  // }
 
   getUniqueSelector(element) {
     let selectors = this.getAllSelectors(element);
@@ -228,116 +295,69 @@ class ElementSelector {
   }
 
   calculateReducedSelector(element) {
-    let result = '';
-    const coveoCss = `Breadcrumb
-CardActionBar
-CardOverlay
-CategoryFacet
-DidYouMean
-DynamicFacet
-DynamicFacetRange
-DynamicHierarchicalFacet
-Excerpt
-Facet
-FacetRange
-FacetSlider
-FacetValueSuggestions
-FieldSuggestions
-FieldTable
-FieldValue
-HierarchicalFacet
-Icon
-ImageFieldValue
-Matrix
-MissingTerms
-Omnibox
-OmniboxResultList
-Pager
-PreferencesPanel
-PromotedResultsBadge
-QueryDuration
-QuerySuggestPreview
-QuerySummary
-Querybox
-Quickview
-QuickviewDocument
-Recommendation
-Result
-ResultActionsMenu
-ResultAttachments
-ResultFolding
-ResultLayoutSelector
-ResultLink
-ResultList
-ResultRating
-ResultTagging
-ResultsFiltersPreferences
-ResultsPerPage
-ResultsPreferences
-SearchAlerts
-SearchAlertsMessage
-SearchButton
-SearchInterface
-Searchbox
-Settings
-ShareQuery
-SimpleFilter
-Sort
-SortDropdown
-StarRating
-Tab
-TemplateLoader
-Text
-Thumbnail
-TimespanFacet
-coveo-facet-header
-coveo-facet-value-caption
-
-`.split('\n').map(c => `.Coveo${c}`);
-
     let parents = this.getAllParents(element);
 
     // build up path
     let path = [];
+
+    // console.group('calculateReducedSelector');
+    // console.log(element, parents);
+
     while (parents.length) {
       let parent = parents.shift();
       let selectors = this.getAllSelectors(parent);
       if (selectors.id) {
         path.unshift(selectors.id);
-        if (this.testSelector(element, path.join(' '))) { return path; }
+        if (this.testSelector(element, path.join(' '))) {
+          // console.log('ret 1', path); console.groupEnd();
+          return path;
+        }
       }
       else {
         // try out these attributes:
-        let attrs = 'data-id,data-field,data-value,data-caption,data-original-value,aria-label,caption,href,title'.split(',');
+        let attrs = 'data-id,data-field,data-value,data-caption,data-original-value,caption,href,title'.split(',');
         let attributsPath = [];
 
         for (let i = 0; i < attrs.length; i++) {
           let attr = attrs[i];
           if (selectors.attributes[attr]) {
             let attributExpression = `${parent.classList.length ? '.' + parent.classList[0] : parent.nodeName}[${attr}="${selectors.attributes[attr]}"]`;
-            attributsPath.push(attributExpression)
-            if (this.testSelector(element, `${attributExpression} ` + path.join(' '))) { return [attributExpression, ...path]; }
+            attributsPath.push(attributExpression);
+
+            if (this.testSelector(element, `${attributExpression} ` + path.join(' '))) {
+              // console.log('ret 2', [attributExpression, ...path]); console.groupEnd();
+              return [attributExpression, ...path];
+            }
             break;
           }
         }
 
         if (attributsPath.length) {
           path.unshift(attributsPath.join(''));
-          if (this.testSelector(element, path.join(' '))) { return path; }
+          if (this.testSelector(element, path.join(' '))) {
+            // console.log('ret 3', path); console.groupEnd();
+            return path;
+          }
         }
         else {
           // consider only Coveo classes first
-          let cls = selectors.cls.filter(c => coveoCss.includes(c));
+          let cls = selectors.cls.filter(c => COVEO_CSS_CLASSES.includes(c));
           if (cls.length) {
             path.unshift(cls.join(''));
-            if (this.testSelector(element, path.join(' '))) { return path; }
+            if (this.testSelector(element, path.join(' '))) {
+              // console.log('ret 4', path); console.groupEnd();
+              return path;
+            }
           }
           else {
             // try out all classes
             let cls = selectors.cls;
             if (cls.length) {
               path.unshift(cls.join(''));
-              if (this.testSelector(element, path.join(' '))) { return path; }
+              if (this.testSelector(element, path.join(' '))) {
+                // console.log('ret 5', path); console.groupEnd();
+                return path;
+              }
             }
             else {
               path.unshift(parent.nodeName);
@@ -348,26 +368,33 @@ coveo-facet-value-caption
 
       if (path.length) {
         // check if need position
-        let elementList = parent.parentNode.querySelectorAll(path.join(' '));
-        if (!((elementList.length === 1) && elementList[0].isSameNode(element))) {
+        let parentParent = parent.parentNode || parent.ownerDocument;
+        let elementList = parentParent.querySelectorAll(path.join(' '));
+        // console.log('position-previous: ', path.join(' '), selectors.nth);
+        if (!((elementList.length === 1) && elementList[0].isSameNode(element)) && selectors.nth) {
           let previousPath = path.shift();
           path.unshift(previousPath + selectors.nth);
+          // console.log('position: ', path.join(' '));
         }
       }
 
     }
-
+    // console.log(path);
+    // console.groupEnd();
     return path;
   }
 
   getReducedSelector(element) {
     let path = this.calculateReducedSelector(element);
+    // console.group('getReducedSelector');
+    // console.log('getReducedSelector: ', element, path);
     // try to reduce more by removing rules that don't have an impact
-    let selectors = [...path];
+    let selectors = [...path].filter(s => s);
     let idx = 1;
 
     while (idx < selectors.length) {
       let selectorsReduced = [...selectors];
+      // console.log('getReducedSelector - iter: ', selectorsReduced.join(' '));
 
       let selectorToReject = selectorsReduced.splice(idx, 1)[0];
       if (selectorToReject.includes('.Coveo')) {
@@ -385,16 +412,14 @@ coveo-facet-value-caption
       }
     }
 
+    // console.log('getReducedSelector - done: ', selectors.join(' '));
+    // console.groupEnd();
     return selectors.join(' ');
   }
 
   toString() {
     let defaultSelector = this.getQuerySelector(this.element);
     let reducedSelector = this.getReducedSelector(this.element);
-
-    console.log('D:', defaultSelector);
-    console.log('R:', reducedSelector);
-
     return this.testSelector(this.element, reducedSelector) ? reducedSelector : defaultSelector;
   }
 

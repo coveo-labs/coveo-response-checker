@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------------------
 var DEFAULT_TIMEOUT = 5000;
 
-var fixes =['.coveo-query-syntax-disabled.magic-box.magic-box-hasFocus','REG: > svg > g > .*$','.coveo-accessible-button-pressed','.magic-box-notEmpty.magic-box-hasFocus'];
+var fixes = ['.coveo-query-syntax-disabled.magic-box.magic-box-hasFocus', 'REG: > svg > g > .*$', '.coveo-accessible-button-pressed', '.magic-box-notEmpty.magic-box-hasFocus'];
 
 if (typeof EventTypes == "undefined") {
   EventTypes = {};
@@ -45,48 +45,48 @@ function NightwatchRenderer() {
   this.unamed_element_id = 1;
 }
 
-NightwatchRenderer.prototype.text = function(txt) {
+NightwatchRenderer.prototype.text = function (txt) {
   // todo: long lines
   //this.document.writeln(txt);
-  this.document += txt+'\n';
+  this.document += txt + '\n';
 };
 
-NightwatchRenderer.prototype.stmt = function(text, indent) {
+NightwatchRenderer.prototype.stmt = function (text, indent) {
   if (indent == undefined) indent = 1;
   var output = new Array(2 * indent).join(" ") + text;
   //this.document.writeln(output);
-  this.document += output+'\n';
+  this.document += output + '\n';
 };
 
-NightwatchRenderer.prototype.cont = function(text) {
+NightwatchRenderer.prototype.cont = function (text) {
   //this.document.writeln("    ... " + text);
-  this.document += "    ... " + text+'\n';
+  this.document += "    ... " + text + '\n';
 };
 
-NightwatchRenderer.prototype.pyout = function(text) {
+NightwatchRenderer.prototype.pyout = function (text) {
   //this.document.writeln("    " + text);
-  this.document += "    " + text+'\n';
+  this.document += "    " + text + '\n';
 };
 
-NightwatchRenderer.prototype.pyrepr = function(text, escape) {
+NightwatchRenderer.prototype.pyrepr = function (text, escape) {
   // todo: handle non--strings & quoting
   var s = "'" + text + "'";
   if (escape) s = s.replace(/(['"])/g, "\\$1");
   return s;
 };
 
-NightwatchRenderer.prototype.space = function() {
+NightwatchRenderer.prototype.space = function () {
   //this.document.write("\n");
   this.document += '\n';
 };
 
-NightwatchRenderer.prototype.regexp_escape = function(text) {
+NightwatchRenderer.prototype.regexp_escape = function (text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s\/]/g, "\\$&");
 };
 
-NightwatchRenderer.prototype.cleanStringForXpath = function(str, escape) {
+NightwatchRenderer.prototype.cleanStringForXpath = function (str, escape) {
   var parts = str.match(/[^'"]+|['"]/g);
-  parts = parts.map(function(part) {
+  parts = parts.map(function (part) {
     if (part === "'") {
       return '"\'"'; // output "'"
     }
@@ -134,15 +134,15 @@ NightwatchRenderer.prototype.dispatch = d;
 
 var cc = EventTypes;
 
-NightwatchRenderer.prototype.render = function(with_xy, tests) {
+NightwatchRenderer.prototype.render = function (with_xy, tests) {
   this.with_xy = with_xy;
   var etypes = EventTypes;
   //this.document.open();
   //this.document.write("<" + "pre" + ">");
-  this.document+="<" + "pre" + " class=mycode id='NightwatchCode' >";
+  this.document += "<pre class=mycode id='NightwatchCode' >";
   this.writeHeader();
   var last_down = null;
-  let last_up=null;
+  let last_up = null;
   var forget_click = false;
 
   for (var i = 0; i < this.items.length; i++) {
@@ -152,7 +152,7 @@ NightwatchRenderer.prototype.render = function(with_xy, tests) {
     if (i == 0) {
       if (item.type != etypes.OpenUrl) {
         this.text(
-          "ERROR: the recorded sequence does not start with a url openning."
+          "// ERROR: the recorded sequence does not start with a url openning."
         );
       } else {
         this.startUrl(item);
@@ -175,7 +175,7 @@ NightwatchRenderer.prototype.render = function(with_xy, tests) {
         //Always use the mousedown event
         item = last_down;
         //Fire click for this instead
-        if (item.info.tagName!='SELECT')   this[this.dispatch[etypes.Click]](item);
+        if (item.info.tagName != 'SELECT') this[this.dispatch[etypes.Click]](item);
         continue;
       } else {
         console.log('Selector: forget click');
@@ -188,34 +188,34 @@ NightwatchRenderer.prototype.render = function(with_xy, tests) {
       }
     }
     //If we are selecting sometehing
-    if (item.type==  etypes.Change && item.info.tagName=='SELECT') {
+    if (item.type == etypes.Change && item.info.tagName == 'SELECT') {
       console.log('We have a SELECT statement, we remove it');
       this[this.dispatch[etypes.Change]](item);
       continue;
     }
     //If we are selecting sometehing
-    if (item.type==  etypes.Change && item.info.tagName=='INPUT' && item.info.type=="checkbox") {
+    if (item.type == etypes.Change && item.info.tagName == 'INPUT' && item.info.type == "checkbox") {
       console.log('We have a SELECT statement for INPUT, just click on it');
       this[this.dispatch[etypes.Click]](item);
       continue;
     }
-    if (item.type==  etypes.Click && item.info.tagName=='SELECT') {
+    if (item.type == etypes.Click && item.info.tagName == 'SELECT') {
       console.log('We have a CLICK/SELECT statement');
       this[this.dispatch[etypes.Change]](item);
       continue;
     }
     //Fix onChange
-    if (item.type== etypes.Change && item.info.tagName!='SELECT' && (item.info.id!="" || item.info.selector!="")) {
+    if (item.type == etypes.Change && item.info.tagName != 'SELECT' && (item.info.id != "" || item.info.selector != "")) {
       //ignore normal change events
       console.log('We have a ONCHANGE statement');
       continue;
     }
-    if ((item.type== etypes.Change || item.type==etypes.Click) && item.info.id=="" && item.info.selector=="") {
+    if ((item.type == etypes.Change || item.type == etypes.Click) && item.info.id == "" && item.info.selector == "") {
       //Take previous one and dispatch a click
-      console.log('Selector: fixing onChange/empty onClick'+item.info.selector);
+      console.log('Selector: fixing onChange/empty onClick' + item.info.selector);
       try {
         if (!last_up) {
-          item = this.items[i-1];
+          item = this.items[i - 1];
           this[this.dispatch[etypes.Click]](item);
         } else {
           last_up = null;
@@ -227,15 +227,15 @@ NightwatchRenderer.prototype.render = function(with_xy, tests) {
     }
     //check if we need to click if same position as mouse up
     if (item.type == etypes.Click && last_up) {
-         //If mouseup is defined, take that instead of the current click, if they are on the same position
-         //Sinde mouse up is triggering click now we can discard this one
-         if ((last_up.x == item.x && last_up.y == item.y) || (item.x==undefined)) { 
-          console.log('Selector: remove onclick because of mouseup');
-          //item = last_up;
-          //this[this.dispatch[etypes.Click]](item);
-          last_up=null;
-          continue;
-         }
+      //If mouseup is defined, take that instead of the current click, if they are on the same position
+      //Sinde mouse up is triggering click now we can discard this one
+      if ((last_up.x == item.x && last_up.y == item.y) || (item.x == undefined)) {
+        console.log('Selector: remove onclick because of mouseup');
+        //item = last_up;
+        //this[this.dispatch[etypes.Click]](item);
+        last_up = null;
+        continue;
+      }
     }
     if (item.type == etypes.Click && forget_click) {
       forget_click = false;
@@ -260,12 +260,12 @@ NightwatchRenderer.prototype.render = function(with_xy, tests) {
   }
   this.writeFooter();
   //this.document.write("<" + "/" + "pre" + ">");
-  this.document+="<" + "/" + "pre" + ">";
+  this.document += "<" + "/" + "pre" + ">";
   //this.document.close();
   return this.document;
 };
 
-NightwatchRenderer.prototype.writeHeader = function() {
+NightwatchRenderer.prototype.writeHeader = function () {
   var date = new Date();
   this.text(
     "/*==============================================================================*/",
@@ -277,17 +277,17 @@ NightwatchRenderer.prototype.writeHeader = function() {
     0
   );
   this.space();
-  this.stmt('const fs = require("fs");',0);
-  this.stmt("var DEFAULT_TIMEOUT = 5000;",0);
+  this.stmt('const fs = require("fs");', 0);
+  this.stmt("var DEFAULT_TIMEOUT = 5000;", 0);
   this.stmt("module.exports = {", 0);
   //this.stmt("'test case': function(client) {", 1);
   this.stmt("'test case': async function(client) {", 1);
 
-  this.stmt("let mypage = client.page.Coveo();",2);
-  this.stmt('await mypage.setPause(2000);',2);
+  this.stmt("let mypage = client.page.Coveo();", 2);
+  this.stmt('await mypage.setPause(2000);', 2);
   //this.stmt("return client", 2);
 };
-NightwatchRenderer.prototype.writeFooter = function() {
+NightwatchRenderer.prototype.writeFooter = function () {
   this.stmt(`
   client.execute('return window.events', (result) => {
     console.log(result.value);
@@ -300,68 +300,65 @@ NightwatchRenderer.prototype.writeFooter = function() {
       console.log("data: " + json.obj);
     }
     //console.log(result);
-  });`,1);
+  });`, 1);
   this.space();
   this.stmt("}", 1);
   this.stmt("};", 0);
 };
-NightwatchRenderer.prototype.rewriteUrl = function(url) {
+NightwatchRenderer.prototype.rewriteUrl = function (url) {
   return url;
 };
 
-NightwatchRenderer.prototype.shortUrl = function(url) {
+NightwatchRenderer.prototype.shortUrl = function (url) {
   return url;
   //this breaks the CSS selectors for xpath
   //return url.substr(url.indexOf("/", 10), 999999999);
 };
 
-NightwatchRenderer.prototype.startUrl = function(item) {
+NightwatchRenderer.prototype.startUrl = function (item) {
   var url = this.pyrepr(this.rewriteUrl(item.url));
   this.stmt("client.resizeWindow(" + item.width + ", " + item.height + ");", 3);
   this.stmt("client.url(" + url + ");", 3);
-  this.stmt("client.pause(DEFAULT_TIMEOUT);",3);
-  this.stmt('await client.execute(fs.readFileSync("src/ajaxListener.js").toString());',2);
-  this.stmt("client.pause(DEFAULT_TIMEOUT);",3);
+  this.stmt("client.pause(DEFAULT_TIMEOUT);", 3);
+  this.stmt('await client.execute(fs.readFileSync("src/ajaxListener.js").toString());', 2);
+  this.stmt("client.pause(DEFAULT_TIMEOUT);", 3);
 
 };
 
-NightwatchRenderer.prototype.openUrl = function(item) {
+NightwatchRenderer.prototype.openUrl = function (item) {
   var url = this.pyrepr(this.rewriteUrl(item.url));
   this.stmt("client.url('" + item.width + ", " + item.height + "');", 3);
-  this.stmt("client.pause(DEFAULT_TIMEOUT);",3);
+  this.stmt("client.pause(DEFAULT_TIMEOUT);", 3);
 };
 
-NightwatchRenderer.prototype.pageLoad = function(item) {
+NightwatchRenderer.prototype.pageLoad = function (item) {
   var url = this.pyrepr(this.rewriteUrl(item.url));
   this.history.push(url);
 };
 
-NightwatchRenderer.prototype.normalizeWhitespace = function(s) {
-  return s
-    .replace(/^\s*/, "")
-    .replace(/\s*$/, "")
-    .replace(/\s+/g, " ");
+NightwatchRenderer.prototype.normalizeWhitespace = function (s) {
+  return s.trim().replace(/\s+/g, " ");
 };
 
 
-NightwatchRenderer.prototype.fixSelector = function(selector) {
-  fixes.map(fix=> {
-    if (fix.indexOf('REG:')!=-1) {
+NightwatchRenderer.prototype.fixSelector = function (selector) {
+  fixes.map(fix => {
+    if (fix.indexOf('REG:') != -1) {
       //Use regular expression
       let fixreg = fix;
-      let reg = fixreg.replace('REG:','');
+      let reg = fixreg.replace('REG:', '');
       //Check if selector ends with ", if so keep it
-      let endwith = selector.endsWith('"')?'"':'';
+      let endwith = selector.endsWith('"') ? '"' : '';
       selector = selector.replace(new RegExp(reg), endwith);
     } else {
-    selector = selector.replace(fix,'');
+      selector = selector.replace(fix, '');
     }
- });
-  
+  });
+
   return selector;
 };
 
-NightwatchRenderer.prototype.getControl = function(item) {
+NightwatchRenderer.prototype.getControl = function (item) {
   var type = item.info.type;
   var tag = item.info.tagName.toLowerCase();
   var selector;
@@ -382,7 +379,7 @@ NightwatchRenderer.prototype.getControl = function(item) {
   return selector;
 };
 
-NightwatchRenderer.prototype.getControlXPath = function(item) {
+NightwatchRenderer.prototype.getControlXPath = function (item) {
   var type = item.info.type;
   var way;
   if ((type == "submit" || type == "button") && item.info.value)
@@ -394,7 +391,7 @@ NightwatchRenderer.prototype.getControlXPath = function(item) {
   return way;
 };
 
-NightwatchRenderer.prototype.getLinkXPath = function(item) {
+NightwatchRenderer.prototype.getLinkXPath = function (item) {
   var way;
   if (item.text)
     way =
@@ -410,7 +407,7 @@ NightwatchRenderer.prototype.getLinkXPath = function(item) {
 };
 
 // DnD template
-NightwatchRenderer.prototype.mousedrag = function(item) {
+NightwatchRenderer.prototype.mousedrag = function (item) {
   if (this.with_xy) {
     this.stmt(".moveTo(null, " + item.before.x + ", " + item.before.y + ")", 3);
     this.stmt(".mouseButtonDown(0)", 3);
@@ -419,56 +416,46 @@ NightwatchRenderer.prototype.mousedrag = function(item) {
   }
 };
 
-NightwatchRenderer.prototype.click = function(item) {
+NightwatchRenderer.prototype.click = function (item) {
   //Check if we have valid info
-  if (item.info.id=="" && item.info.selector=="") return;
-  var tag = item.info.tagName.toLowerCase();
-  
+  if (item.info.id == "" && item.info.selector == "") return;
+  let tag = item.info.tagName.toLowerCase();
+  let xpath_selector = false;
+
   if (this.with_xy && !(tag == "a" || tag == "input" || tag == "button")) {
-    this.stmt(".moveTo(null, " + item.x + ", " + item.y + ")", 3);
+    this.stmt(`.moveTo(null, ${item.x}, ${item.y})`, 3);
     this.stmt(".mouseButtonDown(0)", 3);
     this.stmt(".mouseButtonUp(0)", 3);
   } else {
-    var selector;
+    let selector;
     if (tag == "a") {
-      var xpath_selector = false;// this.getLinkXPath(item);
+      xpath_selector = false;// this.getLinkXPath(item);
       if (xpath_selector) {
-        selector = '"//a[' + xpath_selector + ']"';
+        selector = '`//a[' + xpath_selector.replace(/`/g, '\\`') + ']`';
       } else {
-        selector = '"'+item.info.selector+'"';
+        selector = '`' + item.info.selector.replace(/`/g, '\\`') + '`';
       }
     } /*else if (tag == "input" || tag == "button") {
       selector = this.getFormSelector(item) + this.getControl(item);
       selector = '"' + selector + '"';
     } */
     else {
-      selector = '"' + item.info.selector + '"';
+      selector = '`' + item.info.selector.replace(/`/g, '\\`') + '`';
     }
     //xpath_selector && this.stmt(".useXpath()");
-    console.log("path: " + selector);
+    console.log("path: ", selector);
     //clean selector
     selector = this.fixSelector(selector);
-    console.log("path after fix: " + selector);
-    //this.stmt(".waitForElementVisible(" + selector + ", DEFAULT_TIMEOUT)", 3);
-    //this.stmt(".customClick(" + selector + ")", 3);
-    //this.stmt(".click(" + selector + ")", 3);
-    if (xpath_selector) {
-      this.stmt("await mypage.c_moveToElement(" + selector + ",10,10,'xpath');", 3);
-      this.stmt("await mypage.c_click(" + selector + ",'xpath');", 3);
-      this.stmt("await mypage.c_Pause();",3);
+    console.log("path after fix: ", selector);
 
-    } else {
-      this.stmt("await mypage.c_moveToElement(" + selector + ",10,10);", 3);
-      this.stmt("await mypage.c_click(" + selector + ");", 3);
-      this.stmt("await mypage.c_Pause();",3);
-
-    }
-    
-    //xpath_selector && this.stmt(".useCss()");
+    let xpathParameter = xpath_selector ? `,'xpath'` : '';
+    this.stmt(`await mypage.c_moveToElement(${selector},10,10${xpathParameter});`, 3);
+    this.stmt(`await mypage.c_click(${selector}${xpathParameter});`, 3);
+    this.stmt("await mypage.c_Pause();", 3);
   }
 };
 
-NightwatchRenderer.prototype.getFormSelector = function(item) {
+NightwatchRenderer.prototype.getFormSelector = function (item) {
   var info = item.info;
   if (!info.form) {
     return "";
@@ -483,7 +470,7 @@ NightwatchRenderer.prototype.getFormSelector = function(item) {
   }
 };
 
-NightwatchRenderer.prototype.keypress = function(item) {
+NightwatchRenderer.prototype.keypress = function (item) {
   var text = item.text.replace("\n", "").replace("\r", "\\r");
   //console.log("key: " + text);
   /*this.stmt(
@@ -496,13 +483,13 @@ NightwatchRenderer.prototype.keypress = function(item) {
   selector = this.fixSelector(selector);
   this.stmt('await client.clearValue("' + selector + '");', 3);
   this.stmt('await mypage.c_setValue("' + selector + '", "' + text + '");', 3);
-  this.stmt("await mypage.c_Pause();",3);
+  this.stmt("await mypage.c_Pause();", 3);
   /*this.stmt('client.keys(client.Keys.ENTER);',3);
   this.stmt("client.pause(DEFAULT_TIMEOUT);",3);*/
 };
 
 
-NightwatchRenderer.prototype.change = function(item) {
+NightwatchRenderer.prototype.change = function (item) {
   var text = item.info.value.replace("\n", "").replace("\r", "\\r");
   //console.log("key: " + text);
   /*this.stmt(
@@ -513,22 +500,22 @@ NightwatchRenderer.prototype.change = function(item) {
   let selector = this.getControl(item);
   selector = this.fixSelector(selector);
   this.stmt('await mypage.c_setValue("' + selector + '", "' + text + '");', 3);
-  this.stmt("await mypage.c_Pause();",3);
-  this.stmt("await mypage.c_Pause();",3);
+  this.stmt("await mypage.c_Pause();", 3);
+  this.stmt("await mypage.c_Pause();", 3);
 };
 
-NightwatchRenderer.prototype.submit = function(item) {
+NightwatchRenderer.prototype.submit = function (item) {
   // the submit has been called somehow (user, or script)
   // so no need to trigger it.
   this.stmt("/* submit form */");
 };
 
-NightwatchRenderer.prototype.screenShot = function(item) {
+NightwatchRenderer.prototype.screenShot = function (item) {
   this.stmt('.saveScreenShot("screenshot' + this.screen_id + '.png")', 3);
   this.screen_id = this.screen_id + 1;
 };
 
-NightwatchRenderer.prototype.comment = function(item) {
+NightwatchRenderer.prototype.comment = function (item) {
   this.stmt("// comment? todo: find out this case", 3);
   //var lines = item.text.split('\n');
   //this.stmt('casper.then(function() {');
@@ -538,24 +525,24 @@ NightwatchRenderer.prototype.comment = function(item) {
   //this.stmt('});');
 };
 
-NightwatchRenderer.prototype.checkPageTitle = function(item) {
+NightwatchRenderer.prototype.checkPageTitle = function (item) {
   var title = this.pyrepr(item.title, true);
   // CM: this.stmt('.assert.title(' + title + ')', 3);
   this.stmt('.expect.element("title").text.to.equal(' + title + ")", 3);
 };
 
-NightwatchRenderer.prototype.checkPageLocation = function(item) {
+NightwatchRenderer.prototype.checkPageLocation = function (item) {
   var url = this.regexp_escape(item.url);
   this.stmt('.assert.urlContains("' + url + '")');
 };
 
-NightwatchRenderer.prototype.checkTextPresent = function(item) {
+NightwatchRenderer.prototype.checkTextPresent = function (item) {
   var selector =
     '"//*[contains(text(), ' + this.pyrepr(item.text, true) + ')]"';
   this.waitAndTestSelector(selector, "xPath");
 };
 
-NightwatchRenderer.prototype.checkValue = function(item) {
+NightwatchRenderer.prototype.checkValue = function (item) {
   var type = item.info.type;
   var way = this.getControlXPath(item);
   var selector = "";
@@ -573,7 +560,7 @@ NightwatchRenderer.prototype.checkValue = function(item) {
   this.waitAndTestSelector(selector, "xPath");
 };
 
-NightwatchRenderer.prototype.checkText = function(item) {
+NightwatchRenderer.prototype.checkText = function (item) {
   var selector = "";
   if (item.info.type == "submit" || item.info.type == "button") {
     selector = '"//input[@value=' + this.pyrepr(item.text, true) + ']"';
@@ -586,7 +573,7 @@ NightwatchRenderer.prototype.checkText = function(item) {
   this.waitAndTestSelector(selector, "xPath");
 };
 
-NightwatchRenderer.prototype.checkHref = function(item) {
+NightwatchRenderer.prototype.checkHref = function (item) {
   var href = this.pyrepr(this.shortUrl(item.info.href));
   var xpath_selector = this.getLinkXPath(item);
   if (xpath_selector) {
@@ -601,7 +588,7 @@ NightwatchRenderer.prototype.checkHref = function(item) {
   xpath_selector && this.stmt(".useCss()");
 };
 
-NightwatchRenderer.prototype.checkEnabled = function(item) {
+NightwatchRenderer.prototype.checkEnabled = function (item) {
   var way = this.getControlXPath(item);
   var tag = item.info.tagName.toLowerCase();
   this.waitAndTestSelector(
@@ -610,7 +597,7 @@ NightwatchRenderer.prototype.checkEnabled = function(item) {
   );
 };
 
-NightwatchRenderer.prototype.checkDisabled = function(item) {
+NightwatchRenderer.prototype.checkDisabled = function (item) {
   var way = this.getControlXPath(item);
   var tag = item.info.tagName.toLowerCase();
   this.waitAndTestSelector(
@@ -619,7 +606,7 @@ NightwatchRenderer.prototype.checkDisabled = function(item) {
   );
 };
 
-NightwatchRenderer.prototype.checkSelectValue = function(item) {
+NightwatchRenderer.prototype.checkSelectValue = function (item) {
   var value = this.pyrepr(item.info.value);
   var way = this.getControlXPath(item);
   this.waitAndTestSelector(
@@ -628,16 +615,16 @@ NightwatchRenderer.prototype.checkSelectValue = function(item) {
   );
 };
 
-NightwatchRenderer.prototype.checkSelectOptions = function(item) {
+NightwatchRenderer.prototype.checkSelectOptions = function (item) {
   this.stmt("/* TODO */");
 };
 
-NightwatchRenderer.prototype.checkImageSrc = function(item) {
+NightwatchRenderer.prototype.checkImageSrc = function (item) {
   var src = this.pyrepr(this.shortUrl(item.info.src));
   this.waitAndTestSelector('"//img[@src=' + src + ']"', "xPath");
 };
 
-NightwatchRenderer.prototype.waitAndTestSelector = function(
+NightwatchRenderer.prototype.waitAndTestSelector = function (
   selector,
   xpathSelector
 ) {
