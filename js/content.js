@@ -44,7 +44,7 @@ let decodeRaw = function (raw) {
       rawString = decodeURIComponent(String.fromCharCode.apply(null, c));
     }
     catch (e) {
-      console.error('decodeRaw Error: ', e);
+      //console.error('decodeRaw Error: ', e);
     }
   }
 
@@ -65,7 +65,7 @@ let decodeRaw = function (raw) {
       var text = decodeURIComponent(e.target.result);
       const regex = /^.*=/gm;
       text = text.replace(regex,'');
-      console.log(text);
+      //console.log(text);
       var obj = JSON.parse(text);
       window.postMessage({url:url, content:obj});
       } catch(e)
@@ -91,9 +91,9 @@ window.removeEventListener('message', reactOnBeacon);
 function reactOnBeacon(event) {
   //console.log('from me');
   //console.log(JSON.stringify(event.data.content));
-  
+
   chrome.runtime.sendMessage({
-    action:"beacon",
+    action: "beacon",
     url: event.data.url,
     data: JSON.stringify(event.data.content)
   });
@@ -101,25 +101,25 @@ function reactOnBeacon(event) {
 
 window.addEventListener("message", reactOnBeacon, false);
 
-let lastid=0;
+let lastid = 0;
 //Fix all html elements, give them a unique id
-function addIds(){
+function addIds() {
 
-  document.querySelectorAll('*').forEach(function(node) {
+  document.querySelectorAll('*').forEach(function (node) {
     // Do whatever you want with the node object.
-    if (node.id == undefined || node.id=='' || node.tagName!='HTML') {
+    if (node.id == undefined || node.id == '' || node.tagName != 'HTML') {
       //Add a new id
       let isUnique = false;
       let newid = node.nodeName;
-      
+
       //Check if unique
-      let result = document.querySelectorAll('#'+newid);
+      let result = document.querySelectorAll('#' + newid);
 
       if ((result.length === 1) && (result[0] === element)) {
         isUnique = true;
         node.id = newid;
       } else {
-        node.id = 'CRT'+lastid;
+        node.id = 'CRT' + lastid;
         lastid = lastid + 1;
       }
     }
@@ -143,29 +143,29 @@ let SendMessage = (parameters) => {
 
 if (chrome && chrome.runtime && chrome.runtime.onMessage) {
   //console.log('Adding Listener');
-  chrome.runtime.onMessage.addListener(function(request, sender, response){
-  //if (chrome && chrome.runtime && chrome.runtime.onMessage) {
+  chrome.runtime.onMessage.addListener(function (request, sender, response) {
+    //if (chrome && chrome.runtime && chrome.runtime.onMessage) {
     //console.log("In runtime OnMessage");
     //console.log(request);
     //chrome.runtime.onMessage.addListener(
-      //function (request/*, sender, sendResponse*/) {
-        //console.log("In OnMessage");
-        if (request.type === 'download') {
-          console.log('Got Download');
-          downloadReport(request.name, request.text);
-        }
-        if (request.type === 'enabled') {
-          console.log('enabled');
-          //setTimeout( function() {addIds();},300);
-        }
-        if (request.action === 'open') {
-          console.log('open');
-          //addIds();
-        }
-        
-        return true; 
-      }
-    );
+    //function (request/*, sender, sendResponse*/) {
+    //console.log("In OnMessage");
+    if (request.type === 'download') {
+      //console.log('Got Download');
+      downloadReport(request.name, request.text);
+    }
+    if (request.type === 'enabled') {
+      //console.log('enabled');
+      //setTimeout( function() {addIds();},300);
+    }
+    if (request.action === 'open') {
+      //console.log('open');
+      //addIds();
+    }
+
+    return true;
+  }
+  );
 }
 
 function downloadReport(filename, text) {
@@ -182,19 +182,19 @@ function downloadReport(filename, text) {
 }
 
 chrome.runtime.sendMessage({
-  action:"gotLoc",
+  action: "gotLoc",
   url: window.location.toString()
 });
 
 //get the UA version used
 //Version?
-var reg =/\/(.{1,5})\/coveoua\.js/gm;
+var reg = /\/(.{1,5})\/coveoua\.js/gm;
 let matches = document.documentElement.innerHTML.match(reg);
 if (matches) {
-    chrome.runtime.sendMessage({
-      action:"setVersion",
-      v: matches[0].match('\/(.*)\/')[0].replace('/','').replace('/','')
-  
+  chrome.runtime.sendMessage({
+    action: "setVersion",
+    v: matches[0].match('\/(.*)\/')[0].replace('/', '').replace('/', '')
+
   });
-    
+
 }

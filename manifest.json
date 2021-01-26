@@ -1,41 +1,46 @@
 {
-	"manifest_version": 2,
-	"name": "Coveo Response Checker",
-	"short_name": "coveo-response-checker",
-	"version": "1.0",
-	"description": "A Chrome extension to check the responses sent to the Coveo Organization.",
-
-	"icons": {
-		"16": "images/80 B rounded square.png",
-		"48": "images/120 B rounded square.png",
-		"128": "images/180 B rounded square.png"
-	},
-	"background": {
-		"scripts": ["js/background.js"]
-	},
-	"browser_action": {
-		"default_icon": "/images/80 B rounded square.png",
-		"default_popup": "/popup.html"
-	},
+  "manifest_version": 2,
+  "name": "Coveo Response Checker",
+  "short_name": "coveo-response-checker",
+  "version": "1.0",
+  "description": "A Chrome extension to check the responses sent to the Coveo Organization.",
+  "icons": {
+    "16": "images/80 B rounded square.png",
+    "48": "images/120 B rounded square.png",
+    "128": "images/180 B rounded square.png"
+  },
+  "background": {
+    "scripts": [
+      "js/background.js"
+    ]
+  },
+  "browser_action": {
+    "default_icon": "/images/80 B rounded square.png",
+    "default_popup": "/popup.html"
+  },
   "devtools_page": "devtools.html",
-	"content_scripts": [{
-		"run_at": "document_end",
-		"matches": [
-			"<all_urls>"
-		],
-		"js": [
-			"/dependencies/jquery-2.2.4.min.js","/js/select.js","/js/recorder.js","/js/content.js"
-		],
-		"css": [
-			"/css/inject.css"
-		],
-		"all_frames": false
-	}],
-	"permissions": [
-		"activeTab",
-		"webRequest",
-		"webRequestBlocking",
+  "content_scripts": [
+    {
+      "run_at": "document_start",
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "/dependencies/jquery-2.2.4.min.js",
+        "/js/select.js",
+        "/js/recorder.js",
+        "/js/content.js"
+      ],
+      "css": [
+        "/css/inject.css"
+      ],
+      "all_frames": false
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "webRequest",
+    "webRequestBlocking",
     "*://*/"
-	]
-
+  ]
 }

@@ -1,241 +1,401 @@
 "use strict";
 
-function siblingPosition(node) {
-    var i = 1;
-    while(node = node.previousSibling) {
-        if (node.nodeType == 1) i+= 1;
-    }
-
-    return i;
-}
-
-function getQuerySelector2(node) {
-    if(node.id) return "#" + node.id;
-    if(node.nodeName == "BODY") return "body";
-
-    var position = siblingPosition(node);
-
-    return getQuerySelector(node.parentNode) + ">:nth-child("+ position +")";
-}
-
-var indexOf = [].indexOf || function(item) {
-  for (var i = 0, len = this.length; i < len; i++) {
-    if ((i in this) && (this[i] === item)) {
-      return i;
-    }
+class ElementSelector {
+  constructor(element) {
+    this.element = element;
   }
-  return -1;
-};
 
-function isElement(element) {
-  return !!((element != null ? element.nodeType : void 0) === 1);
-};
+  isElement(element) {
+    return !!((element ? element.nodeType : void 0) === 1);
+  }
 
-function getAllParents(element) {
-  var currentElement, result;
-  result = [];
-  if (isElement(element)) {
-    currentElement = element;
-    while (isElement(currentElement)) {
-      result.push(currentElement);
+  getAllParents(element) {
+    let currentElement = element;
+    let elements = [];
+    while (this.isElement(currentElement)) {
+      elements.push(currentElement);
       currentElement = currentElement.parentNode;
     }
+    return elements;
   }
-  return result;
-};
 
-function getTagSelector(element) {
-  return element.tagName.toLowerCase();
-};
-
-function sanitizeItem(item) {
-  return escape(item).replace(/\%/g, '\\').replace(/\*\+\-\.\//g, '\\$&');
-};
-
-function validateId (id) {
-  if (id == null) {
-    return false;
+  getTagSelector(element) {
+    return element.tagName.toLowerCase();
   }
-  if (/^\d/.exec(id)) {
-    return false;
-  }
-  return document.querySelectorAll("#" + id).length === 1;
-};
 
-function getIdSelector(element) {
-  var id;
-  id = element.getAttribute('id');
-  if (id != null) {
-    id = sanitizeItem(id);
+  sanitizeItem(item) {
+    // Why do we need this?
+    return escape(item).replace(/\%/g, '\\').replace(/\*\+\-\.\//g, '\\$&');
   }
-  id = validateId(id) ? id = "#" + id : id = null;
-  return id;
-};
 
-function getClassSelectors(element) {
-  var classString, item, result;
-  result = [];
-  classString = element.getAttribute('class');
-  if (classString != null) {
-    classString = classString.replace(/\s+/g, ' ');
-    classString = classString.replace(/^\s|\s$/g, '');
-    if (classString !== '') {
-      result = (function() {
-        var i, len, ref, results;
-        ref = classString.split(/\s+/);
-        results = [];
-        for (i = 0, len = ref.length; i < len; i++) {
-          item = ref[i];
-          results.push("." + (sanitizeItem(item)));
-        }
-        return results;
-      }).call(this);
+  validateId(id) {
+    if (!id) {
+      return false;
     }
-  }
-  return result;
-};
-
-function getAttributeSelectors(element) {
-  var attribute, blacklist, i, len, ref, ref1, result;
-  result = [];
-  blacklist = ['id', 'class'];
-  ref = element.attributes;
-  for (i = 0, len = ref.length; i < len; i++) {
-    attribute = ref[i];
-    if (ref1 = attribute.nodeName, indexOf.call(blacklist, ref1) < 0) {
-      result.push("[" + attribute.nodeName + "=" + attribute.nodeValue + "]");
+    if (/^\d/.test(id)) {
+      return false;
     }
+    return document.querySelectorAll("#" + id).length === 1;
   }
-  return result;
-};
 
-function getNthChildSelector(element) {
-  var counter, i, len, parentElement, sibling, siblings;
-  parentElement = element.parentNode;
-  if (parentElement != null) {
-    counter = 0;
-    siblings = parentElement.childNodes;
-    for (i = 0, len = siblings.length; i < len; i++) {
-      sibling = siblings[i];
-      if (isElement(sibling)) {
-        counter++;
-        if (sibling === element) {
-          return ":nth-child(" + counter + ")";
+  getIdSelector(element) {
+    let id = element.getAttribute('id');
+    if (id) {
+      id = this.sanitizeItem(id);
+    }
+    id = this.validateId(id) ? id = "#" + id : null;
+    return id;
+  }
+
+  getClassSelectors(element) {
+    let cssClasses = [];
+    for (let i = 0; i < element.classList.length; i++) {
+      cssClasses.push('.' + element.classList[i]);
+    }
+    return cssClasses;
+  }
+
+  getAttributeSelectors(element) {
+    let result = [];
+    let blacklist = ['id', 'class'];
+
+    for (let i = 0; i < element.attributes.length; i++) {
+      let attr = element.attributes[i];
+
+      if (!blacklist.includes(attr.nodeName)) {
+        result.push(`[${attr.nodeName}="${attr.nodeValue}"]`);
+      }
+    }
+
+    return result;
+  }
+
+  getAttributes(element) {
+    let attributes = {};
+    let blacklist = ['id', 'class'];
+
+    for (let i = 0; i < element.attributes.length; i++) {
+      let attr = element.attributes[i];
+      if (!blacklist.includes(attr.nodeName)) {
+        attributes[attr.nodeName] = attr.nodeValue;
+      }
+    }
+    return attributes;
+  }
+
+  getNthChildSelector(element) {
+    let parentElement = element.parentNode;
+    if (parentElement != null) {
+      let counter = 0;
+      let siblings = parentElement.childNodes;
+      for (let i = 0, len = siblings.length; i < len; i++) {
+        let sibling = siblings[i];
+        if (this.isElement(sibling)) {
+          counter++;
+          if (sibling.isSameNode(element)) {
+            return `:nth-child(${counter})`;
+          }
         }
       }
     }
+    return null;
   }
-  return null;
-};
 
-function testSelector(element, selector) {
-  var isUnique = false, result;
 
-  if ((selector != null) && selector !== '') {
-    result = element.ownerDocument.querySelectorAll(selector);
+  // test if the selector is leading to the current element only.
+  testSelector(element, selector) {
+    if (selector) {
+      let result = element.ownerDocument.querySelectorAll(selector);
 
-    if ((result.length === 1) && (result[0] === element)) {
-      isUnique = true;
+      if ((result.length === 1) && element.isSameNode(result[0])) {
+        return true;
+      }
     }
+
+    return false;
   }
 
-  return isUnique;
-};
-
-function getAllSelectors(element) {
-  return {
-    tag: getTagSelector(element),
-    id: getIdSelector(element),
-    cls: getClassSelectors(element),
-    attr: getAttributeSelectors(element),
-    nth: getNthChildSelector(element)
-  };
-};
-
-function testUniqueElement(element, selector) {
-  var elementList, parent;
-  parent = element.parentNode;
-  elementList = parent.querySelectorAll(selector);
-  return (elementList.length === 1) && (elementList[0] === element);
-};
-
-function getUniqueSelector(element) {
-  var allClasses, selector, selectors;
-
-  selectors = getAllSelectors(element);
-  
-  if (selectors.id != null) {
-    return selectors.id;
+  testUniqueElementWithinParent(element, selector) {
+    let elementList = element.parentNode.querySelectorAll(selector);
+    return (elementList.length === 1) && (elementList[0].isSameNode(element));
   }
-  
-  if (testUniqueElement(element, selectors.tag)) {
-    return selectors.tag;
+
+  getAllSelectors(element) {
+    return {
+      tag: this.getTagSelector(element),
+      id: this.getIdSelector(element),
+      cls: this.getClassSelectors(element),
+      attr: this.getAttributeSelectors(element),
+      attributes: this.getAttributes(element),
+      nth: this.getNthChildSelector(element)
+    };
   }
-  
-  if (selectors.cls.length !== 0) {
-    allClasses = selectors.cls.join('');
-    selector = allClasses;
-    if (testUniqueElement(element, selector)) {
-      return selector;
+
+  reduceSelector(selectors, element) {
+    if (selectors.id != null) {
+      return selectors.id;
     }
-    selector = selectors.tag + allClasses;
-    if (testUniqueElement(element, selector)) {
-      return selector;
+
+    if (this.testUniqueElementWithinParent(element, selectors.tag)) {
+      return selectors.tag;
     }
-  }
-  
-  return selectors.nth;
-};
 
-
-function getQuerySelector(element) {
-  var allSelectors, i, item, j, len, len1, parents, result, selector, selectors;
-  allSelectors = [];
-  parents = getAllParents(element);
-
-  /**
-   * Gets all unique selector for element parent nodes
-   */
-  for (i = 0, len = parents.length; i < len; i++) {
-    item = parents[i];
-    selector = getUniqueSelector(item);
-    if (selector != null) {
-      allSelectors.push(selector);
+    if (selectors.cls.length !== 0) {
+      let allClasses = selectors.cls.join('');
+      let selector = allClasses;
+      if (this.testUniqueElementWithinParent(element, selector)) {
+        return selector;
+      }
+      selector = selectors.tag + allClasses;
+      if (this.testUniqueElementWithinParent(element, selector)) {
+        return selector;
+      }
     }
+
+    return selectors.nth;
   }
 
-  /**
-   * Return the shortest unique selector matched for given element
-   */
-  selectors = [];
-  for (j = 0, len1 = allSelectors.length; j < len1; j++) {
-    item = allSelectors[j];
-    selectors.unshift(item);
-    result = selectors.join(' > ');
-    /*if (testSelector(element, result)) {
-      return result;
-    }*/
-  }
-  //Find the first ID and use that
-  var last = result.lastIndexOf("#");
-  if (last!=-1) {
-     result = result.substring(last);
-  }
-  return result;
-  //return null;
-};
+  getUniqueSelector(element) {
+    let selectors = this.getAllSelectors(element);
 
-function getQuerySelector3(element) {
-  const idx = (sib, name) => sib 
-        ? idx(sib.previousElementSibling, name||sib.localName) + (sib.localName == name)
-        : 1;
-    const segs = elm => !elm || elm.nodeType !== 1 
-        ? ['']
-        : elm.id && document.getElementById(elm.id) === elm
-            ? [`id("${elm.id}")`]
-            : [...segs(elm.parentNode), elm instanceof HTMLElement
-                ? `${elm.localName}[${idx(elm)}]`
-                : `*[local-name() = "${elm.localName}"][${idx(elm)}]`];
-    return segs(element).join('/');
+    if (selectors.id != null) {
+      return selectors.id;
+    }
+
+    if (this.testUniqueElementWithinParent(element, selectors.tag)) {
+      return selectors.tag;
+    }
+
+    if (selectors.cls.length !== 0) {
+      let allClasses = selectors.cls.join('');
+      let selector = allClasses;
+      if (this.testUniqueElementWithinParent(element, selector)) {
+        return selector;
+      }
+      selector = selectors.tag + allClasses;
+      if (this.testUniqueElementWithinParent(element, selector)) {
+        return selector;
+      }
+    }
+
+    return selectors.nth;
+  }
+
+  getSelectors(element) {
+    let allSelectors = [];
+    let parents = this.getAllParents(element);
+
+    /**
+     * Gets all unique selector for element parent nodes
+     */
+    for (let i = 0, len = parents.length; i < len; i++) {
+      let item = parents[i];
+      // let selectors = this.getAllSelectors(element);
+      let selector = this.getUniqueSelector(item);
+      if (selector) {
+        allSelectors.push(selector);
+      }
+    }
+
+    return allSelectors;
+  }
+
+  getQuerySelector(element) {
+    let result = '';
+
+    let allSelectors = this.getSelectors(element);
+
+    /**
+     * Return the shortest unique selector matched for given element
+     */
+    let selectors = [];
+    for (let j = 0, len1 = allSelectors.length; j < len1; j++) {
+      let item = allSelectors[j];
+      selectors.unshift(item);
+      result = selectors.join(' > ');
+      /*if (testSelector(element, result)) {
+        return result;
+      }*/
+    }
+
+    //Find the first ID and use that
+    let last = result.lastIndexOf("#");
+    if (last != -1) {
+      result = result.substring(last);
+    }
+
+    return result;
+  }
+
+  calculateReducedSelector(element) {
+    let result = '';
+    const coveoCss = `Breadcrumb
+CardActionBar
+CardOverlay
+CategoryFacet
+DidYouMean
+DynamicFacet
+DynamicFacetRange
+DynamicHierarchicalFacet
+Excerpt
+Facet
+FacetRange
+FacetSlider
+FacetValueSuggestions
+FieldSuggestions
+FieldTable
+FieldValue
+HierarchicalFacet
+Icon
+ImageFieldValue
+Matrix
+MissingTerms
+Omnibox
+OmniboxResultList
+Pager
+PreferencesPanel
+PromotedResultsBadge
+QueryDuration
+QuerySuggestPreview
+QuerySummary
+Querybox
+Quickview
+QuickviewDocument
+Recommendation
+Result
+ResultActionsMenu
+ResultAttachments
+ResultFolding
+ResultLayoutSelector
+ResultLink
+ResultList
+ResultRating
+ResultTagging
+ResultsFiltersPreferences
+ResultsPerPage
+ResultsPreferences
+SearchAlerts
+SearchAlertsMessage
+SearchButton
+SearchInterface
+Searchbox
+Settings
+ShareQuery
+SimpleFilter
+Sort
+SortDropdown
+StarRating
+Tab
+TemplateLoader
+Text
+Thumbnail
+TimespanFacet
+coveo-facet-header
+coveo-facet-value-caption
+
+`.split('\n').map(c => `.Coveo${c}`);
+
+    let parents = this.getAllParents(element);
+
+    // build up path
+    let path = [];
+    while (parents.length) {
+      let parent = parents.shift();
+      let selectors = this.getAllSelectors(parent);
+      if (selectors.id) {
+        path.unshift(selectors.id);
+        if (this.testSelector(element, path.join(' '))) { return path; }
+      }
+      else {
+        // try out these attributes:
+        let attrs = 'data-id,data-field,data-value,data-caption,data-original-value,aria-label,caption,href,title'.split(',');
+        let attributsPath = [];
+
+        for (let i = 0; i < attrs.length; i++) {
+          let attr = attrs[i];
+          if (selectors.attributes[attr]) {
+            let attributExpression = `${parent.classList.length ? '.' + parent.classList[0] : parent.nodeName}[${attr}='${selectors.attributes[attr]}']`;
+            attributsPath.push(attributExpression)
+            if (this.testSelector(element, `${attributExpression} ` + path.join(' '))) { return [attributExpression, ...path]; }
+            break;
+          }
+        }
+
+        if (attributsPath.length) {
+          path.unshift(attributsPath.join(''));
+          if (this.testSelector(element, path.join(' '))) { return path; }
+        }
+        else {
+          // consider only Coveo classes first
+          let cls = selectors.cls.filter(c => coveoCss.includes(c));
+          if (cls.length) {
+            path.unshift(cls.join(''));
+            if (this.testSelector(element, path.join(' '))) { return path; }
+          }
+          else {
+            // try out all classes
+            let cls = selectors.cls;
+            if (cls.length) {
+              path.unshift(cls.join(''));
+              if (this.testSelector(element, path.join(' '))) { return path; }
+            }
+            else {
+              path.unshift(parent.nodeName);
+            }
+          }
+        }
+      }
+
+      if (path.length) {
+        // check if need position
+        let elementList = parent.parentNode.querySelectorAll(path.join(' '));
+        if (!((elementList.length === 1) && elementList[0].isSameNode(element))) {
+          let previousPath = path.shift();
+          path.unshift(previousPath + selectors.nth);
+        }
+      }
+
+    }
+
+    return path;
+  }
+
+  getReducedSelector(element) {
+    let path = this.calculateReducedSelector(element);
+    // try to reduce more by removing rules that don't have an impact
+    let selectors = [...path];
+    let idx = 1;
+
+    while (idx < selectors.length) {
+      let selectorsReduced = [...selectors];
+
+      let selectorToReject = selectorsReduced.splice(idx, 1)[0];
+      if (selectorToReject.includes('.Coveo')) {
+        // keep the selectors with .CoveoX for clarity
+        idx++;
+        continue;
+      }
+
+      if (this.testSelector(element, selectorsReduced.join(' '))) {
+        // still good, update
+        selectors = selectorsReduced;
+      }
+      else {
+        idx++;
+      }
+    }
+
+    return selectors.join(' ');
+  }
+
+  toString() {
+    let defaultSelector = this.getQuerySelector(this.element);
+    let reducedSelector = this.getReducedSelector(this.element);
+
+    //console.log('D:', defaultSelector);
+    //console.log('R:', reducedSelector);
+
+    return this.testSelector(this.element, reducedSelector) ? reducedSelector : defaultSelector;
+  }
 
 }

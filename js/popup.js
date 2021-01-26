@@ -27,50 +27,56 @@ function copyToClipboard(text) {
 }
 
 function createReportHTML(title) {
-   let html='';
-   html+=`<h1>${title}</h1>`;
-   var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-   var today = new Date();
- 
-   html+='<table><tr><td>Created on</td><td>'+today.toLocaleDateString("en-US", options)+'</td></tr>';
-   html+=`<tr><td>Url</td><td>${currentState.document_url}</td></tr>`;
-   html+=`<tr><td>UA Version</td><td>${currentState.uaversion}</td></tr>`;
-   html+='</table>';
-   html+='<BR>';
-   html+=`<br>Online help resources:<br><br>
+  let html = '';
+  html += `<h1>${title}</h1>`;
+  var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  var today = new Date();
+
+  html += '<table><tr><td>Created on</td><td>' + today.toLocaleDateString("en-US", options) + '</td></tr>';
+  html += `<tr><td>Url</td><td><a href='${encodeURI(currentState.document_url)}'>${currentState.document_url}</a></td></tr>`;
+  html += `<tr><td>UA Version</td><td>${currentState.uaversion}</td></tr>`;
+  html += '</table>';
+  html += '<BR>';
+  html += `<br>Online help resources:<br><br>
    <a href="https://docs.coveo.com/en/52" target="_blank" style='padding-left: 10px;'>Search</a>
    <a href="https://docs.coveo.com/en/1373" target="_blank" style='padding-left: 10px;'>Analytics</a>
    <a href="https://docs.coveo.com/en/3188" target="_blank" style='padding-left: 10px;'>E Commerce</a><br><br>`;
-   html+='<h2>Overview</h2>';
-   html+= document.getElementById('overview').innerHTML;
-   html+='<hr><h2>Queries</h2>';
-   html+=document.getElementById('QR').innerHTML;
-   html+='<hr><h2>Query Suggest</h2>';
-   html+=document.getElementById('QS').innerHTML;
-   html+='<hr><h2>Analytics</h2>';
-   html+=document.getElementById('AR').innerHTML;
-   html+='<hr><h2>E Commerce</h2>';
-   html+=document.getElementById('EC').innerHTML;
-   html+='<hr><h2>Requests</h2>';
-   html+='';
-   for (var i = 0; i <currentState.dev.length; i++) {
-    let empty="";
-    let title = currentState.dev[i].title?" - "+currentState.dev[i].title:'';
-    let status = currentState.dev[i].statusCode?"<span class='sc'>statusCode: "+currentState.dev[i].statusCode+"</span>":"";
+  if (currentState.scen_enabled) {
+    html += '<br>Scenario: ' + $("#ScenarioSelector option:selected").text();
+    html += '<br>' + document.getElementById('scenarioInstructions').innerHTML;
+    html += '<hr>' + document.getElementById('scenarioResults').innerHTML;
+  } else {
+    html += '<h2>Overview</h2>';
+    html += document.getElementById('overview').innerHTML;
+    html += '<hr><h2>Queries</h2>';
+    html += document.getElementById('QR').innerHTML;
+    html += '<hr><h2>Query Suggest</h2>';
+    html += document.getElementById('QS').innerHTML;
+    html += '<hr><h2>Analytics</h2>';
+    html += document.getElementById('AR').innerHTML;
+    html += '<hr><h2>E Commerce</h2>';
+    html += document.getElementById('EC').innerHTML;
+  }
+  html += '<hr><h2>Requests</h2>';
+  html += '';
+  for (var i = 0; i < currentState.dev.length; i++) {
+    let empty = "";
+    let title = currentState.dev[i].title ? " - " + currentState.dev[i].title : '';
+    let status = currentState.dev[i].statusCode ? "<span class='sc'>statusCode: " + currentState.dev[i].statusCode + "</span>" : "";
     let statusok = '';
     if (currentState.dev[i].statusCode) {
-      statusok =currentState.dev[i].statusCode==200?"validInd":"notvalidInd";
+      statusok = currentState.dev[i].statusCode == 200 ? "validInd" : "notvalidInd";
     }
 
-    let line = `<span class='spacing'></span><span class='type ${!currentState.dev[i].data.flag&&currentState.dev[i].statusCode==200?"validIndB":"notvalidIndB"}'>${currentState.dev[i].request.type}${title}</span><span class="time">${currentState.dev[i].time}</span>`;
+    let line = `<span class='spacing'></span><span class='type ${!currentState.dev[i].data.flag && currentState.dev[i].statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${currentState.dev[i].request.type}${title}</span><span class="time">${currentState.dev[i].time}</span>`;
     //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
-    line += `<span class='url ${statusok}'><a href='${currentState.dev[i].request.url}' target='_blank'>${currentState.dev[i].request.url}</a>${status}</span>`;
-    line += `<ul>${currentState.dev[i].data.content}</ul>`+empty;
-    line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode'>${JSON.stringify(currentState.dev[i].request.data,null,2)}</pre></details>`;
+    line += `<span class='url ${statusok}'><a href='${encodeURI(currentState.dev[i].request.url)}' target='_blank'>${currentState.dev[i].request.url}</a>${status}</span>`;
+    line += `<ul>${currentState.dev[i].data.content}</ul>` + empty;
+    line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode'>${JSON.stringify(currentState.dev[i].request.data, null, 2)}</pre></details>`;
     //document.getElementById('ALL').innerHTML=line+document.getElementById('ALL').innerHTML;
-    html+= line;
-    }
-   return html;
+    html += line;
+  }
+  return html;
 }
 
 function getReportHTML() {
@@ -153,7 +159,7 @@ h2, .h2 {
 .crs td { white-space: nowrap;max-width: 500px;min-width: 30px;vertical-align: top;font-family:Arial !important;	font-size:11pt !important;		border:1px solid #C0C0C0;		padding:5px;}	
 .numbers { text-align:right}
 td.nobord {border:none !important;}
-.propvalue,sc {
+.propvalue,.sc {
   display: block;
     font-weight: normal;
     font-family: courier;
@@ -170,6 +176,14 @@ span.spacing {
   display: block;
   padding: 5px;
   clear: both;
+}
+span.persistent {
+  background-color: #fea1a1;
+  font-family: courier;
+  word-break: break-all;
+  clear: both;
+    display: block;
+  /* width: 200px; */
 }
 
 span.type {
@@ -266,8 +280,11 @@ ul.tabs{
 //Download the report
 function downloadReport() {
   try {
-    let url= new URL(currentState.document_url);
-    let title = url.hostname.replace('.',' ');
+    let url = new URL(currentState.document_url);
+    let title = url.hostname.replace('.', ' ');
+    if (currentState.scen_enabled) {
+      title += ' - Scenario ' + currentState.scenarioId;
+    }
     myDownloadTitle = title;
     let html = getReportHTML();
     let filename = '';
@@ -297,19 +314,46 @@ let processState = (data) => {
     processReport(data.json);
   }*/
   $('#setSearchTracker input').prop('checked', data.enabledSearch);
+  $('#setScenario input').prop('checked', data.scen_enabled);
   //if we have actual data
-  let showReport = data.queryRequests.length>0 || data.querySuggestRequests.length>0 || data.analyticRequests.length>0 || data.ecommerceRequests.length>0;
-  if (showReport) {
-    $('#globalReport').show();
-    processData(data);
-  }
+  let showReport = data.queryRequests.length > 0 || data.querySuggestRequests.length > 0 || data.analyticRequests.length > 0 || data.ecommerceRequests.length > 0;
   console.log(data);
+  if (data.scen_enabled) {
+    $('#globalReport').hide();
+    $('#scenario').show();
+    $('#instructions').hide();
+    g_scenarios = data.scenario;
+    if (data.scenario == undefined) {
+      SendMessage({ type: 'getScenarios' }, fillScenarios);
+    }
+    if (data.scenarioId!='') {
+      updateScenario(data.scenarioId, data);
+      fillScenarios(data.scenario);
+      $('#ScenarioSelector').val(data.scenarioId).change();
+      $(`#ScenarioSelector option[value=${data.scenarioId}]`).attr('selected', 'selected');
+    }
+    if (data.scenario != undefined) {
+      processDataSC(data);
+    }
+
+  } else {
+    if (showReport) {
+      $('#btnscenario').removeClass('activeButton');
+      $('#globalReport').show();
+      $('#scenario').hide();
+
+      processData(data);
+    }
+  }
+  //Enable Scneario onChange
+  $('#ScenarioSelector').on('change', selectScenario);
+
   //console.log(data.enabledSearch);
   changeUI(data.enabledSearch, false);
   //console.log(data.tab);
   //if (data.tab != 'OverviewA')  
   fixTabs(data.tab);
-  
+
 };
 
 let createTests = (state) => {
@@ -317,50 +361,81 @@ let createTests = (state) => {
   return tests;
 }
 
-let processData=(state) =>{
+let processDataSC = (state) => {
+  let queries = '';
+  if (state.searchReport != '') {
+    queries += '<hr><h2>Queries</h2>';
+    queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
+    queries += state.searchReport;
+    queries += `</table>`;
+  }
+
+  if (state.qsReport != '') {
+    queries += '<hr><h2>Query Suggestions</h2>';
+    queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
+    queries += state.qsReport;
+    queries += `</table>`;
+  }
+  if (state.analyticReport != '') {
+    queries += '<hr><h2>Analytics</h2>';
+    queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
+    queries += state.analyticReport;
+    queries += `</table>`;
+  }
+
+  if (state.ecReport != '') {
+    queries += '<hr><h2>E Commerce</h2>';
+    queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Event</th><th colspan=2>Checks (all requests)</th></tr>`;
+    queries += state.ecReport;
+    queries += `</table>`;
+  }
+  document.getElementById('scenarioResults').innerHTML = queries;
+}
+
+let processData = (state) => {
   //Add warnings to headers
-  let overviewValid = state.queryRequests.length>0 && state.querySuggestRequests.length>0 && state.analyticRequests.length>0;
-  document.getElementById('OverviewA').className = overviewValid?"validInd":"notvalidInd";
-  document.getElementById('QRA').className = !state.searchInd?"validInd":"notvalidInd";
-  document.getElementById('QSA').className = !state.qsInd?"validInd":"notvalidInd";
-  document.getElementById('ARA').className = !state.analyticInd?"validInd":"notvalidInd";
-  document.getElementById('ECA').className = !state.ecInd?"validInd":"notvalidInd";
-  let overview='';
-  overview+= `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th>Nr of Requests</th></tr>`;
-  overview+= `<tr><td class=${state.queryRequests.length>0?"valid":"notvalid"}></td><td>Queries</td><td class="numbers">${state.queryRequests.length}</td></tr>`;
-  overview+= `<tr><td class=${state.querySuggestRequests.length>0?"valid":"notvalid"}></td><td>Query Suggest</td><td  class="numbers">${state.querySuggestRequests.length}</td></tr>`;
-  overview+= `<tr><td class=${state.analyticRequests.length>0?"valid":"notvalid"}></td><td>Analytics</td><td  class="numbers">${state.analyticRequests.length}</td></tr>`;
-  overview+= `<tr><td class='${state.ecommerceRequests.length>0?"valid":"notvalid"} notmandatory'></td><td>E Commerce</td><td  class="numbers">${state.ecommerceRequests.length}</td></tr>`;
-  overview+= `<tr><td class='${state.uaversion!=''?"valid":"notvalid"} notmandatory'></td><td>UA Version</td><td  class="numbers">${state.uaversion}</td></tr>`;
-  overview+= `</table>`;
+  let overviewValid = state.queryRequests.length > 0 && state.querySuggestRequests.length > 0 && state.analyticRequests.length > 0;
+  document.getElementById('OverviewA').className = overviewValid ? "validInd" : "notvalidInd";
+  document.getElementById('QRA').className = !state.searchInd ? "validInd" : "notvalidInd";
+  document.getElementById('QSA').className = !state.qsInd ? "validInd" : "notvalidInd";
+  document.getElementById('ARA').className = !state.analyticInd ? "validInd" : "notvalidInd";
+  document.getElementById('ECA').className = !state.ecInd ? "validInd" : "notvalidInd";
+  let overview = '';
+  overview += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th>Nr of Requests</th></tr>`;
+  overview += `<tr><td class=${state.queryRequests.length > 0 ? "valid" : "notvalid"}></td><td>Queries</td><td class="numbers">${state.queryRequests.length}</td></tr>`;
+  overview += `<tr><td class=${state.querySuggestRequests.length > 0 ? "valid" : "notvalid"}></td><td>Query Suggest</td><td  class="numbers">${state.querySuggestRequests.length}</td></tr>`;
+  overview += `<tr><td class=${state.analyticRequests.length > 0 ? "valid" : "notvalid"}></td><td>Analytics</td><td  class="numbers">${state.analyticRequests.length}</td></tr>`;
+  overview += `<tr><td class='${!state.ecInd ? "valid" : "notvalid"} notmandatory'></td><td>E Commerce</td><td  class="numbers">${state.ecommerceRequests.length}</td></tr>`;
+  overview += `<tr><td class='${state.uaversion != '' ? "valid" : "notvalid"} notmandatory'></td><td>UA Version</td><td  class="numbers">${state.uaversion}</td></tr>`;
+  overview += `</table>`;
   //console.log(overview);
   document.getElementById('overview').innerHTML = overview;
 
   let queries = '';
-  queries+= `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
-  queries+= state.searchReport;
-  queries+= `</table>`;
+  queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
+  queries += state.searchReport;
+  queries += `</table>`;
   document.getElementById('QR').innerHTML = queries;
 
   queries = '';
-  queries+= `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
-  queries+= state.qsReport;
-  queries+= `</table>`;
+  queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
+  queries += state.qsReport;
+  queries += `</table>`;
   document.getElementById('QS').innerHTML = queries;
 
   queries = '';
-  queries+= `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
-  queries+= state.analyticReport;
-  queries+= `</table>`;
+  queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
+  queries += state.analyticReport;
+  queries += `</table>`;
   document.getElementById('AR').innerHTML = queries;
 
   queries = '';
-  queries+= `<table class="crs datepicker-table"><tr><th>Valid</th><th colspan=2>Content (last request)</th></tr>`;
-  queries+= state.ecReport;
-  queries+= `</table>`;
+  queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Event</th><th colspan=2>Checks (all requests)</th></tr>`;
+  queries += state.ecReport;
+  queries += `</table>`;
   document.getElementById('EC').innerHTML = queries;
 
-  let nightwatch='';
+  let nightwatch = '';
   document.getElementById('Nightwatch').innerHTML = '';
   var dt = new NightwatchRenderer();
   dt.items = state.record;
@@ -439,9 +514,46 @@ function toggleTracker() {
   SendMessage({ type: 'enablesearch', enable });
 }
 
+function updateScenario(scenarioId, data) {
+  //Find the scenarioId in global scenario and show instructions
+  let html = '';
+  let selectedsc;
+  if (g_scenarios == undefined && data != undefined) {
+    g_scenarios = data.scenario;
+
+  }
+  if (scenarioId == "-1") return;
+  g_scenarios.all.map((sc) => {
+    if (sc.id == scenarioId) {
+      html = sc.instructions;
+    }
+  });
+  document.getElementById('scenarioInstructions').innerHTML = 'Instructions:<BR><div class="InstructionSet">' + html+"</div>";
+  //Add the tests
+  if (data != undefined) {
+
+  }
+}
+
+function selectScenario() {
+  let scenarioId = $('#ScenarioSelector').val();
+  if (scenarioId != "-1") {
+    SendMessage({ type: 'selectscenario', scenarioId: scenarioId });
+    updateScenario(scenarioId);
+    //Check if tracker needs to be set
+    if (!currentState.enabledSearch) {
+      //Start tracker
+      $('#setSearchTracker input').prop('checked', $('#setSearchTracker input').prop('checked') ? false : true);
+      toggleTracker();
+    }
+    //getState();
+  }
+}
+
 function reset() {
   //reset all parameters
   $('#instructions').show();
+
   $('#myscreenimage').css('background-image', 'none').hide();
   $('#setSearchTracker input').prop('checked', false);
   $('#push').attr("disabled", true);
@@ -468,7 +580,7 @@ function SendMessage(typeOrMessage, callback) {
 }
 
 
-function changeUI(enable,message = true) {
+function changeUI(enable, message = true) {
   console.log('ChangeUI');
   if (enable) {
     $('#recording').show();
@@ -476,11 +588,11 @@ function changeUI(enable,message = true) {
     $('#instructions').hide();
     $('#loading').hide();
     if (message) {
-    $('#startrecord').removeClass('mod-hidden');
-    setTimeout(() => {
-      $('#startrecord').addClass('mod-hidden');
-    }, 2999);
-  }
+      $('#startrecord').removeClass('mod-hidden');
+      setTimeout(() => {
+        $('#startrecord').addClass('mod-hidden');
+      }, 2999);
+    }
 
     document.getElementById('details').innerHTML = '';
   } else {
@@ -491,10 +603,26 @@ function changeUI(enable,message = true) {
 function toggleTracker() {
   let enable = $('#setSearchTracker input').prop('checked') ? true : false;
   changeUI(enable);
-  
+
   SendMessage({ type: 'enablesearch', enable });
 }
 
+function toggleScenario() {
+  let enable = $('#setScenario input').prop('checked') ? true : false;
+  if (enable) {
+    SendMessage({ type: 'enableSc',enabled: true });
+    SendMessage({ type: 'getScenarios' }, fillScenarios);
+    $('#globalReport').hide();
+    $('#instructions').hide();
+    $('#scenario').show();
+  } else {
+    SendMessage({ type: 'enableSc',enabled: false });
+    $('#instructions').show();
+    $('#scenario').hide();
+    $('#btnscenario').removeClass('activeButton');
+  }
+
+}
 function fixTabs(current) {
   if (current == 'NightwatchA') {
     $('#copyNightwatch').show();
@@ -504,33 +632,47 @@ function fixTabs(current) {
   var tab_lists_anchors = document.querySelector("#tabbs").getElementsByTagName("a");
   var divs = document.querySelector("#tabbs").getElementsByClassName("tab-content");
   for (var i = 0; i < tab_lists_anchors.length; i++) {
-      if (tab_lists_anchors[i].classList.contains('active')) {
-          divs[i].style.display = "block";
-      }
+    if (tab_lists_anchors[i].classList.contains('active')) {
+      divs[i].style.display = "block";
+    }
 
   }
 
   for (i = 0; i < tab_lists_anchors.length; i++) {
 
 
-          for (i = 0; i < divs.length; i++) {
-              divs[i].style.display = "none";
-          }
+    for (i = 0; i < divs.length; i++) {
+      divs[i].style.display = "none";
+    }
 
-          for (i = 0; i < tab_lists_anchors.length; i++) {
-              tab_lists_anchors[i].classList.remove("active");
-          }
-        }
-          var clicked_tab = document.getElementById(current);
+    for (i = 0; i < tab_lists_anchors.length; i++) {
+      tab_lists_anchors[i].classList.remove("active");
+    }
+  }
+  var clicked_tab = document.getElementById(current);
 
-          clicked_tab.classList.add('active');
-          var div_to_show = clicked_tab.getAttribute('href');
+  clicked_tab.classList.add('active');
+  var div_to_show = clicked_tab.getAttribute('href');
 
-          document.querySelector(div_to_show).style.display = "block";
-          SendMessage({ type: 'tabset', tab: current });
+  document.querySelector(div_to_show).style.display = "block";
+  SendMessage({ type: 'tabset', tab: current });
 
-  
+
 }
+
+let g_scenarios = undefined;
+
+function fillScenarios(scenario) {
+  g_scenarios = scenario;
+  $('#ScenarioSelector')
+    .find('option')
+    .remove();
+  $('#ScenarioSelector').append(`<option value="-1">--SELECT--</option>`);
+  scenario.all.map((sc) => {
+    $('#ScenarioSelector').append(`<option value="${sc.id}">${sc.title}</option>`);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   // Handle clicks on slide-toggle buttons
   var manifestData = chrome.runtime.getManifest();
@@ -539,12 +681,15 @@ document.addEventListener('DOMContentLoaded', function () {
   $('#copyNightwatch').hide();
   $('#loading').hide();
   $('#globalReport').hide();
-  $('#tabs').click((e)=> {fixTabs(e.target.id);return false;} );
+  $('#scenario').hide();
+  $('#tabs').click((e) => { fixTabs(e.target.id); return false; });
+  $('#setScenario input').prop('checked', false);
+  $('#setScenario').on('change', toggleScenario);
   $('#setSearchTracker input').prop('checked', false);
   $('#setSearchTracker').on('change', toggleTracker);
   $('#setSearchTrackerButton').click((e) => {
     e.preventDefault();
-    $('#setSearchTracker input').prop('checked',$('#setSearchTracker input').prop('checked') ? false : true);
+    $('#setSearchTracker input').prop('checked', $('#setSearchTracker input').prop('checked') ? false : true);
     toggleTracker();
     return true;
   });
@@ -552,12 +697,17 @@ document.addEventListener('DOMContentLoaded', function () {
   $('#download-global').click(() => {
     downloadReport();
   });
+  $('#btnscenario').click((e) => {
+    e.preventDefault();
+    $('#setScenario input').prop('checked', $('#setScenario input').prop('checked') ? false : true);
+    toggleScenario();
+  })
   $('#showInstructions').click(() => {
     $('#instructions').toggle();
   });
   $('#copyNightwatch').click((e) => {
     e.preventDefault();
-    
+
     copyToClipboard(document.getElementById('NightwatchCode').innerText);
     $('#clipboard-copied').removeClass('mod-hidden');
     setTimeout(() => {
@@ -574,7 +724,8 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#copyNightwatch').hide();
     $('#loading').hide();
     $('#globalReport').hide();
-  
+    SendMessage({ type: 'selectscenario', scenarioId: '' });
+
     SendMessage('reset', getState);
     //window.close();
   });
