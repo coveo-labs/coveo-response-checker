@@ -119,12 +119,16 @@ ul.tabs{
     margin-top: 0px !important;
     overflow: auto;
 }
-.propvalue,.sc {
+.propvalue,.propex,.sc {
   display: block;
     font-weight: normal;
     font-family: courier;
     padding-top: 3px;
     word-break: break-all;
+}
+.propex {
+  font-style: italic;
+  font-size: 0.9em;
 }
 .url a {
   cursor: pointer;
@@ -206,6 +210,7 @@ td.nobord {border:none !important;}
   width: 139px !important;
   height: 65px !important;
   padding-left: 15px !important;
+  margin-top: -8px;
 }
 
 #scores div.wheel a svg {

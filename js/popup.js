@@ -61,7 +61,7 @@ function createReportHTML(title) {
   html += '';
   for (var i = 0; i < currentState.dev.length; i++) {
     let empty = "";
-    let title = currentState.dev[i].title ? " - " + currentState.dev[i].title : '';
+    let title = currentState.dev[i].data.title ? " - " + currentState.dev[i].data.title : '';
     let status = currentState.dev[i].statusCode ? "<span class='sc'>statusCode: " + currentState.dev[i].statusCode + "</span>" : "";
     let statusok = '';
     if (currentState.dev[i].statusCode) {
@@ -159,12 +159,16 @@ h2, .h2 {
 .crs td { white-space: nowrap;max-width: 500px;min-width: 30px;vertical-align: top;font-family:Arial !important;	font-size:11pt !important;		border:1px solid #C0C0C0;		padding:5px;}	
 .numbers { text-align:right}
 td.nobord {border:none !important;}
-.propvalue,.sc {
+.propvalue,.propex,.sc {
   display: block;
     font-weight: normal;
     font-family: courier;
     padding-top: 3px;
     word-break: break-all;
+}
+.propex {
+  font-style: italic;
+  font-size: 0.9em;
 }
 .url a {
   cursor: pointer;
@@ -281,7 +285,7 @@ ul.tabs{
 function downloadReport() {
   try {
     let url = new URL(currentState.document_url);
-    let title = url.hostname.replace('.', ' ');
+    let title = url.hostname.replaceAll('.',' ');
     if (currentState.scen_enabled) {
       title += ' - Scenario ' + currentState.scenarioId;
     }
@@ -363,28 +367,40 @@ let createTests = (state) => {
 
 let processDataSC = (state) => {
   let queries = '';
+  //Final check, is scenario properly done
+  let final = true;
+  if (state['searchIndData']==true) final = final && state.searchInd;
+  if (state['qsIndData']==true) final = final && state.qsInd;
+  if (state['analyticIndData']==true) final = final && state.analyticInd;
+  if (state['ecIndData']==true) final= final && state.ecInd;
+  if (state['searchIndData']==false) final = true;
+  if (state['qsIndData']==false) final = true;
+  if (state['analyticIndData']==false) final = true;
+  if (state['ecIndData']==false) final= true;
+
+  queries += `<h2 class="${!final?'validInd':'notvalidInd'}">Scenario ${!final?'properly':'NOT properly'} executed</h2>`;
   if (state.searchReport != '') {
-    queries += '<hr><h2>Queries</h2>';
+    queries += `<hr><h2 class="${!state.searchInd?'validInd':'notvalidInd'}">Queries</h2>`;
     queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
     queries += state.searchReport;
     queries += `</table>`;
   }
 
   if (state.qsReport != '') {
-    queries += '<hr><h2>Query Suggestions</h2>';
+    queries += `<hr><h2 class="${!state.qsInd?'validInd':'notvalidInd'}">Query Suggestions</h2>`;
     queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
     queries += state.qsReport;
     queries += `</table>`;
   }
   if (state.analyticReport != '') {
-    queries += '<hr><h2>Analytics</h2>';
+    queries += `<hr><h2 class="${!state.analyticInd?'validInd':'notvalidInd'}">Analytics</h2>`;
     queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Check</th><th colspan=2>Content (last request)</th></tr>`;
     queries += state.analyticReport;
     queries += `</table>`;
   }
 
   if (state.ecReport != '') {
-    queries += '<hr><h2>E Commerce</h2>';
+    queries += `<hr><h2 class="${!state.ecInd?'validInd':'notvalidInd'}">E Commerce</h2>`;
     queries += `<table class="crs datepicker-table"><tr><th>Valid</th><th>Event</th><th colspan=2>Checks (all requests)</th></tr>`;
     queries += state.ecReport;
     queries += `</table>`;
@@ -511,6 +527,7 @@ let getState = () => {
 
 function toggleTracker() {
   let enable = $('#setSearchTracker input').prop('checked') ? true : false;
+  currentState.enabledSearch = enable;
   SendMessage({ type: 'enablesearch', enable });
 }
 
@@ -528,24 +545,37 @@ function updateScenario(scenarioId, data) {
       html = sc.instructions;
     }
   });
-  document.getElementById('scenarioInstructions').innerHTML = 'Instructions:<BR><div class="InstructionSet">' + html+"</div>";
+  $('#scenarioInstructions').html('Instructions:<BR><div class="InstructionSet">' + (html)+"</div>");
+  //document.getElementById('scenarioInstructions').innerHTML = 'Instructions:<BR><div class="InstructionSet">' + (html)+"</div>";
   //Add the tests
   if (data != undefined) {
 
   }
 }
 
+function getScenarioState(){
+  //get the scenario created state, so that we can process the data
+  SendMessage('getState', processDataSC);
+
+}
 function selectScenario() {
   let scenarioId = $('#ScenarioSelector').val();
   if (scenarioId != "-1") {
     SendMessage({ type: 'selectscenario', scenarioId: scenarioId });
     updateScenario(scenarioId);
+    
     //Check if tracker needs to be set
     if (!currentState.enabledSearch) {
       //Start tracker
-      $('#setSearchTracker input').prop('checked', $('#setSearchTracker input').prop('checked') ? false : true);
-      toggleTracker();
+      $('#setSearchTracker input').prop('checked', true);
+      //toggleTracker();
+      currentState.enabledSearch = true;
+  SendMessage({ type: 'enablesearch', enable: true });
+      getScenarioState();
+    } else {
+      getScenarioState();
     }
+    
     //getState();
   }
 }
@@ -555,14 +585,14 @@ function reset() {
   $('#instructions').show();
 
   $('#myscreenimage').css('background-image', 'none').hide();
-  $('#setSearchTracker input').prop('checked', false);
   $('#push').attr("disabled", true);
   //$('#showSFDC').attr("disabled", true);
-  document.getElementById('scores').innerHTML = '';
-  document.getElementById('details').innerHTML = '';
+  document.getElementById('scenarioResults').innerHTML = '';
+  $('#setScenario input').prop('checked', false);
+  $('#setSearchTracker input').prop('checked', false);
 
   SendMessage('reset', getState);
-  window.close();
+  //window.close();
 }
 
 function SendMessage(typeOrMessage, callback) {
@@ -718,15 +748,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   $('#getReport').click(getReport);
   $('#clear').click(() => {
-
-    document.getElementById('details').innerHTML = '';
+    reset();
+    /*document.getElementById('details').innerHTML = '';
     $('#recording').hide();
     $('#copyNightwatch').hide();
     $('#loading').hide();
     $('#globalReport').hide();
     SendMessage({ type: 'selectscenario', scenarioId: '' });
 
-    SendMessage('reset', getState);
+    SendMessage('reset', getState);*/
     //window.close();
   });
   getState();

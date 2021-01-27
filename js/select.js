@@ -105,6 +105,7 @@ class ElementSelector {
   // test if the selector is leading to the current element only.
   testSelector(element, selector) {
     if (selector) {
+      if (selector.length>2000) return false;
       let result = element.ownerDocument.querySelectorAll(selector);
 
       if ((result.length === 1) && element.isSameNode(result[0])) {

@@ -69,7 +69,9 @@ let decodeRaw = function (raw) {
       var obj = JSON.parse(text);
       window.postMessage({url:url, content:obj});
       } catch(e)
-      {}
+      {
+        console.error('beacon Error: ', e);
+      }
     });
 
     // Start reading the contents of blob
@@ -91,12 +93,13 @@ window.removeEventListener('message', reactOnBeacon);
 function reactOnBeacon(event) {
   //console.log('from me');
   //console.log(JSON.stringify(event.data.content));
-
+  if (event.data.content!=undefined) {
   chrome.runtime.sendMessage({
     action: "beacon",
     url: event.data.url,
     data: JSON.stringify(event.data.content)
   });
+}
 }
 
 window.addEventListener("message", reactOnBeacon, false);
