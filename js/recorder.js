@@ -240,6 +240,7 @@ TestRecorder.TestCase.prototype.append = function (o) {
     //console.log('Selector: appended => '+JSON.stringify(o));
   } catch (e) { }
   chrome.runtime.sendMessage({ action: "append", obj: o });
+  console.log('Appending');
 };
 
 TestRecorder.TestCase.prototype.peek = function () {
@@ -1068,6 +1069,7 @@ chrome.runtime.sendMessage({ action: "get_status" });
 
 chrome.runtime.onMessage.addListener(function (request, sender, response) {
   if (request.action === 'sent_status') {
+    console.log('sent_status got');
     if (request.active) {
       recorder.start();
     }

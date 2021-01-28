@@ -117,8 +117,10 @@ class ElementSelector {
   }
 
   testUniqueElementWithinParent(element, selector) {
+    if (element.parentNode!=null) {
     let elementList = element.parentNode.querySelectorAll(selector);
     return (elementList.length === 1) && (elementList[0].isSameNode(element));
+    } else return false;
   }
 
   getAllSelectors(element) {
@@ -349,11 +351,13 @@ coveo-facet-value-caption
 
       if (path.length) {
         // check if need position
+        if (parent.parentNode!=null) {
         let elementList = parent.parentNode.querySelectorAll(path.join(' '));
         if (!((elementList.length === 1) && elementList[0].isSameNode(element))) {
           let previousPath = path.shift();
           path.unshift(previousPath + selectors.nth);
         }
+      }
       }
 
     }

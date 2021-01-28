@@ -21,7 +21,7 @@ const FILTER_ANALYTICS = { urls: ["https://*/*analytics*","https://*/*collect*"]
 
 let getTabId_Then = (callback) => {
   this.getActiveTab((tabs) => {
-    callback(activeTabId);
+    callback(tabs.id);
   });
   /*chrome.tabs.query({ active: true, lastFocusedWindow: true}, (tabs) => {
     if (tabs.length>0){
@@ -706,7 +706,10 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg.type === 'enableSc') {
     getTabId_Then(tabId => {
       getState_Then(state => {
-        state.scen_enabled = true;
+        state.scen_enabled = msg.enabled;
+        if (state.scen_enabled == false) {
+          state.scenarioId = '';
+        }
         saveState(state, tabId);
       });
     });
@@ -1639,6 +1642,7 @@ let onAnalyticsRequest = function (details) {
   if (details.url.indexOf('%22/coveo/rest/') != -1) return;
   if (details.url.indexOf('https://analytics.api.tooso') !=-1) return;
   if (details.url.indexOf('fmt=js') !=-1) return;
+  if (details.url.indexOf('/webevents/') !=-1) return;
   if (details.url.indexOf('visitor_id=') !=-1) return;
   if (details.url.indexOf('aip=') !=-1) return;
   //We do not want to track Google GTM events were pa is not in there l&pa=detail&
