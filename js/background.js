@@ -14,9 +14,10 @@ var testcase_items = [];
 var tab_id = null;
 
 /* globals chrome */
+//const FILTER_SEARCH = { urls: ["*://*/rest/search/*", "*://*/search/*", "*://*/*/search/*", "*://*/*/CoveoSearch/*", "*://*/?errorsAsSuccess=1", "*://*/*&errorsAsSuccess=1*", "https://*/rest/search/v2/*", "https://*/rest/search/v2*", "https://*/coveo-search/v2*", "https://*/*/rest/search/v2*", "https://*/*/*/rest/search/v2*", "https://*/coveo/rest/v2*", "https://cloudplatform.coveo.com/rest/search/*", "*://platform.cloud.coveo.com/rest/search/v2/*", "https://search.cloud.coveo.com/rest/search/v2/*", "*://*/*/coveo/platform/rest/*", "*://*/coveo/rest/*"] };
+//const FILTER_ANALYTICS = { urls: ["https://*.cloud.coveo.com/*/analytics/collect*","https://*.cloud.coveo.com/*analytics*","https://*rest/coveoanalytics/*","https://*/rest/coveoanalytics/*","https://*/analytics/collect*","*://*/*coveo/rest/coveoanalytics/*", "*://*/rest/v15/analytics/*", "*://*/collect/*", "*://*/*/collect/*", "*://*/collect*", "*://*/*/collect*", "*://*/v1/analytics/search*", "*://usageanalytics.coveo.com/rest/*", "*://*/*/coveo/analytics/rest/*", "*://*/*/rest/ua/*", "*://*/rest/ua/*", "*://*/*/coveoanalytics/rest/*"] };
 const FILTER_SEARCH = { urls: ["*://*/rest/search/*", "*://*/search/*", "*://*/*/search/*", "*://*/*/CoveoSearch/*", "*://*/?errorsAsSuccess=1", "*://*/*&errorsAsSuccess=1*", "https://*/rest/search/v2/*", "https://*/rest/search/v2*", "https://*/coveo-search/v2*", "https://*/*/rest/search/v2*", "https://*/*/*/rest/search/v2*", "https://*/coveo/rest/v2*", "https://cloudplatform.coveo.com/rest/search/*", "*://platform.cloud.coveo.com/rest/search/v2/*", "https://search.cloud.coveo.com/rest/search/v2/*", "*://*/*/coveo/platform/rest/*", "*://*/coveo/rest/*"] };
-const FILTER_ANALYTICS = { urls: ["https://*.cloud.coveo.com/*/analytics/collect*","https://*.cloud.coveo.com/*analytics*","https://*/rest/coveoanalytics/*","https://*/analytics/collect*","*://*/coveo/rest/coveoanalytics/*", "*://*/rest/v15/analytics/*", "*://*/collect/*", "*://*/*/collect/*", "*://*/collect*", "*://*/*/collect*", "*://*/v1/analytics/search*", "*://usageanalytics.coveo.com/rest/*", "*://*/*/coveo/analytics/rest/*", "*://*/*/rest/ua/*", "*://*/rest/ua/*", "*://*/*/coveoanalytics/rest/*"] };
-//https://platform.cloud.coveo.com/rest/ua/v15/analytics/click?visito
+const FILTER_ANALYTICS = { urls: ["https://*/*analytics*","https://*/*collect*"]};
 
 let getTabId_Then = (callback) => {
   this.getActiveTab((tabs) => {
@@ -634,8 +635,8 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
       //Check if we have currentResponse, that means the onCompleted was already executed
       if (currentResponse != '') {
         rec.statusCode = currentResponse;
-        if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
       }
+      if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
       if (content.content != '')
         state.dev.unshift(rec);
   
@@ -646,8 +647,8 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
     //Check if we have currentResponse, that means the onCompleted was already executed
     if (currentResponse != '') {
       rec.statusCode = currentResponse;
-      if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
     }
+    if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
     if (content.content != '')
       state.dev.unshift(rec);
   }
@@ -660,8 +661,8 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
         //Check if we have currentResponse, that means the onCompleted was already executed
         if (currentResponse != '') {
           rec.statusCode = currentResponse;
-          if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
         }
+        if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
         if (content.content != '')
           state.dev.unshift(rec);
     
@@ -672,8 +673,8 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
     //Check if we have currentResponse, that means the onCompleted was already executed
     if (currentResponse != '') {
       recs.statusCode = currentResponse;
-      if (state.devconnection != '' && senttodev) state.devconnection.postMessage(recs);
     }
+    if (state.devconnection != '' && senttodev) state.devconnection.postMessage(recs);
     if (contents.content != '')
       state.dev.unshift(recs);
   }
@@ -730,8 +731,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
         content.content = `<li class='${(state['searchToken']!=undefined) ? "validInd" : "notvalidInd"} notmandatory' style='width: auto !important;'>searchToken<span class='propvalue'><pre class='code'>${state['searchToken']}</pre></span></li>`;
         content.content += `<li class='${(state['analyticsToken']!=undefined) ? "validInd" : "notvalidInd"} notmandatory' style='width: auto !important;'>analyticsToken<span class='propvalue'><pre class='code'>${state['analyticsToken']}</pre></span></li>`;
-        let rec = { type: 'NAV', statusCode: 200, time: getTime(), req: '', data: content, request: { type: 'Navigated to new Page', url: msg.url, data: {} } };
-        if (state.devconnection != '') state.devconnection.postMessage(rec);
+        let rec = { type: 'NAV', statusCode: 200, time: getTime(), req: '1', data: content, request: { type: 'Navigated to new Page', url: msg.url, data: {} } };
+        if (state.enabledSearch) {
+          state.dev.unshift(rec);
+          if (state.devconnection != '') state.devconnection.postMessage(rec);
+        }
         state.document_url = msg.url;
         //Reset the pp values in the checks
         resetPP(state);
@@ -889,6 +893,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           //Do we need to reset the values?
           resetPersistentValuesScenario(state, state.scenarioId);
           let rec = { type: 'SCENARIO', statusCode: 200, time: getTime(), req: '', data: content, request: { type: 'Scenario Selected: ' + msg.scenarioId, url: '', data: {} } };
+          state.dev.unshift(rec);
           if (state.devconnection != '') state.devconnection.postMessage(rec);
 
         }
@@ -1091,7 +1096,16 @@ function getParameterCaseInsensitive(object, key) {
 let getData = function (raw, formData, events) {
   let postedString = {};
   if (raw) {
-    postedString = JSON.parse(decodeRaw(raw));
+    let decode = decodeRaw(raw);
+    //Is it JSON?
+    try {
+      postedString = JSON.parse(decode);
+    } catch(e) {
+      //it is not JSON, so split it by &
+      //Create a fake url
+      let url = `https://www.coveo.com?${decode}`;
+      postedString = getURLParams(url);
+    }
     //Check if postedString is an array, if so correct it
     if (Array.isArray(postedString)) {
       postedString = postedString[0];
@@ -1129,6 +1143,7 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
   state[report] = '';
 //For ECResults we can have multiple return results for the developer console...
   let content = '';
+  let wehavedata=false;
   let curtitle = '';
   let curvalue = '';
   let curcontent = '';
@@ -1375,6 +1390,7 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
               }
             }
           }
+          wehavedata = true;
           curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'>${check.prop}${translatedProp}<span class='propvalue'>${curvalue}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
           if (!isValid && mandatory && saveit) oneisbad = true;
           if (!isValidSingle && mandatory) oneisbadSingle = true;
@@ -1385,6 +1401,8 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
     if (title == '') {
       if (saveit) {
         state.checks[check.key] = isValid;
+        wehavedata = true;
+
         if (!isValid && mandatory) oneisbad = true;
       }
       if (check.t && go) {
@@ -1423,9 +1441,9 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
     if (initonly==undefined) state[reportindicator] = oneisbad;
     if (initonly==undefined) {
       //Set that we have data received
-      if (content!='') state[reportindicator+'Data'] = true;
+      if (wehavedata) state[reportindicator+'Data'] = true;
     } else {
-      if (content!='') state[reportindicator+'Data'] = false;
+      if (wehavedata) state[reportindicator+'Data'] = false;
     }
   }
   saveState(state, state.tabId);
@@ -1438,6 +1456,11 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
 }
 
 function getURLParams(url) {
+  //Fix relative url's
+  if (!url.startsWith('http')) {
+    url = 'https://platform.coveo.com'+url;
+  }
+
   let newurl = new URL(url);
   let params = new URLSearchParams(newurl.search);
   const result = {}
@@ -1449,6 +1472,8 @@ function getURLParams(url) {
 
 let onSearchRequest = function (details) {
   if (details.method == "OPTIONS" || details.method == "GET") return;
+  if (details.url.indexOf('cloud.coveo.com:443%22') != -1) return;
+
   if (details.url.indexOf('/html?uniqueId') > 0) return;
   if (details.url.indexOf('/analytics/') > 0) return;
   if (details.url.indexOf('/log?') > 0) return;
@@ -1469,7 +1494,7 @@ let onSearchRequest = function (details) {
 
         if (state.dev[i].request.url == details.url && state.dev[i].req == req) {
           state.dev[i].statusCode = details.statusCode;
-          if (state.devconnection != '') state.devconnection.postMessage(state.dev[i]);
+          if (state.devconnection != '') state.devconnection.postMessage({one: state.dev[i]});
           break;
         }
       }
@@ -1489,7 +1514,7 @@ let onSearchRequest = function (details) {
 
       let postedString = getData(raw, formData, events);
       state.querySuggestRequests.unshift({ url: details.url });
-      executeChecks(getTime(), details.requestId, 'Query Suggest', details.url, postedString, state, qsChecks, state.scenario.qsChecks, false, 'qsReport', 'qsInd', false);
+      executeChecks(getTime(), details.requestId, 'Query Suggest', details.url, postedString, state, qsChecks, state.scenario.qsChecks, false, 'qsReport', 'qsInd', true);
 
     }
     else if (details.url.includes('facet')) {
@@ -1511,7 +1536,7 @@ let onSearchRequest = function (details) {
       //console.log(postedString);
       // thisState.queryExecuted = postedString;
       var fullstring = JSON.stringify(postedString);
-      executeChecks(getTime(), details.requestId, 'Query', details.url, postedString, state, searchChecks, state.scenario.searchChecks, false, 'searchReport', 'searchInd', false);
+      executeChecks(getTime(), details.requestId, 'Query', details.url, postedString, state, searchChecks, state.scenario.searchChecks, false, 'searchReport', 'searchInd', true);
       //not now, later if (state.devconnection!='') state.devconnection.postMessage(rec);
 
       /*if ('filterField' in postedString) {//}.includes('filterField=')) {
@@ -1606,11 +1631,16 @@ let addEcResults = function (state) {
 
 }
 
+
+
 let onAnalyticsRequest = function (details) {
   if (details.method == "OPTIONS") return;
   //Weird errors remove them
   if (details.url.indexOf('%22/coveo/rest/') != -1) return;
   if (details.url.indexOf('https://analytics.api.tooso') !=-1) return;
+  if (details.url.indexOf('fmt=js') !=-1) return;
+  if (details.url.indexOf('visitor_id=') !=-1) return;
+  if (details.url.indexOf('aip=') !=-1) return;
   //We do not want to track Google GTM events were pa is not in there l&pa=detail&
   if (details.url.startsWith('https://www.google-analytics') && details.url.indexOf('&pa=') == -1) return;
   getState_Then(state => {
@@ -1628,7 +1658,7 @@ let onAnalyticsRequest = function (details) {
         if (state.dev[i].request.url == details.url && state.dev[i].req == req) {
           state.dev[i].statusCode = details.statusCode;
           found = true;
-          if (state.devconnection != '') state.devconnection.postMessage(state.dev[i]);
+          if (state.devconnection != '') state.devconnection.postMessage({one:state.dev[i]});
           //there could be more with the same requestid
           //break;
         }
@@ -1742,7 +1772,7 @@ let onAnalyticsRequest = function (details) {
 
     //Do nothing if raw==undefined and Object.keys(formData).length==0
     //Data will come in through the beacon event
-    if (raw == undefined && Object.keys(formData).length == 0 && Object.keys(events).length < 5) {
+    if (raw == undefined && Object.keys(formData).length == 0 && Object.keys(events).length < 5) {// && details.url.indexOf('/click')==-1) {
       console.log('POST: EMPTY BEACON');
       //We need this for our beacon POST
       return;
@@ -1753,7 +1783,7 @@ let onAnalyticsRequest = function (details) {
     let postedString = getData(raw, formData, events);
     if (details.url.indexOf('/collect') == -1) {
       state.analyticRequests.unshift({ url: details.url });
-      executeChecks(getTime(), details.requestId, 'Analytics', details.url, postedString, state, analyticChecks, state.scenario.analyticChecks, false, 'analyticReport', 'analyticInd', false);
+      executeChecks(getTime(), details.requestId, 'Analytics', details.url, postedString, state, analyticChecks, state.scenario.analyticChecks, false, 'analyticReport', 'analyticInd', true);
     } else {
       let type = 'E Commerce';
       let google = false;
@@ -1762,7 +1792,7 @@ let onAnalyticsRequest = function (details) {
         google = true;
       }
 
-      executeChecks(getTime(), details.requestId, type, details.url, postedString, state, ecChecks, state.scenario.ecChecks, google, 'ecReport', 'ecInd', false);
+      executeChecks(getTime(), details.requestId, type, details.url, postedString, state, ecChecks, state.scenario.ecChecks, google, 'ecReport', 'ecInd', true);
       state.ecommerceRequests.unshift({ url: details.url });
     }
 

@@ -459,22 +459,43 @@ backgroundPageConnection.onMessage.addListener(function (message) {
   //console.log(message);
   //Check if we are getting everything or a single response
   let enableSc = $('#setScenario input').prop('checked') ? true : false;
-
-  if (message.all) {
+  if (message.one) {
+    //We have a single record which we only need to update the statuscode
+    let status = message.one.statusCode ? "statusCode: " + message.one.statusCode + "" : "";
+    let statusok = '';
+    if (message.one.statusCode) {
+      statusok = message.one.statusCode == 200 ? "validInd" : "notvalidInd";
+    }
+    let newclass = `${!message.one.data.flag && message.one.statusCode ? "validIndB" : "notvalidIndB"}`;
+    let title = message.one.data.title ? " - " + message.one.data.title : '';
+    let reqid = message.one.req+(message.one.data.title ? "" + message.one.data.title : '');
+    let id = '#'+reqid+'';
+    let idstatus = '#'+reqid+'stat';
+    let idstatustext = '#'+reqid+'txt';
+    $(id).removeClass('validIndB');
+    $(id).removeClass('notvalidIndB');
+    $(id).addClass(newclass);
+    $(idstatus).removeClass('validInd');
+    $(idstatus).removeClass('notvalidInd');
+    $(idstatus).addClass(statusok);
+    $(idstatustext).text(status);
+  }
+  else if (message.all) {
     document.getElementById('ALL').innerHTML = '';
     for (var i = 0; i < message.all.length; i++) {
       let empty = "";
       let id = document.getElementById('ALL').innerHTML.length;
       let idc = id + 'c';
       let title = message.all[i].data.title ? " - " + message.all[i].data.title : '';
-      let status = message.all[i].statusCode ? "<span class='sc'>statusCode: " + message.all[i].statusCode + "</span>" : "";
+      let reqid = message.all[i].req+(message.all[i].data.title ? "" + message.all[i].data.title : '');
+      let status = message.all[i].statusCode ? `statusCode: ` + message.all[i].statusCode + "" : "";
       let statusok = '';
       if (message.all[i].statusCode) {
         statusok = message.all[i].statusCode == 200 ? "validInd" : "notvalidInd";
       }
-      let line = `<span class='spacing'></span><span class='type ${!message.all[i].data.flag && message.all[i].statusCode ? "validIndB" : "notvalidIndB"}'>${message.all[i].request.type}${title}</span><span class="time">${message.all[i].time}</span>`;
+      let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.all[i].data.flag && message.all[i].statusCode ? "validIndB" : "notvalidIndB"}'>${message.all[i].request.type}${title}</span><span class="time">${message.all[i].time}</span>`;
       //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
-      line += `<span class='url ${statusok}'><a href='${encodeURI(message.all[i].request.url)}' target='_blank'>${message.all[i].request.url}</a>${status}</span>`;
+      line += `<span id=${reqid}stat class='url ${statusok}'><a href='${encodeURI(message.all[i].request.url)}' target='_blank'>${message.all[i].request.url}</a><span class='sc' id=${reqid}txt>${status}</span></span>`;
       line += `<ul>${message.all[i].data.content}</ul>` + empty;
       line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode' id=${idc}>${JSON.stringify(message.all[i].request.data, null, 2)}</pre></details>`;
       //document.getElementById('ALL').innerHTML=line+document.getElementById('ALL').innerHTML;
@@ -491,14 +512,15 @@ backgroundPageConnection.onMessage.addListener(function (message) {
     let id = document.getElementById('ALL').innerHTML.length;
     let idc = id + 'c';
     let title = message.data.title ? " - " + message.data.title : '';
-    let status = message.statusCode ? "<span class='sc'>statusCode: " + message.statusCode + "</span>" : "";
+    let reqid = message.req+(message.data.title ? "" + message.data.title : '');
+    let status = message.statusCode ? `<span class='sc' id=${message.req}txt>statusCode: ` + message.statusCode + "</span>" : "";
     let statusok = '';
     if (message.statusCode) {
       statusok = message.statusCode == 200 ? "validInd" : "notvalidInd";
     }
-    let line = `<span class='spacing'></span><span class='type ${!message.data.flag && message.statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${message.request.type}${title}</span><span class="time">${message.time}</span>`;
+    let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.data.flag && message.statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${message.request.type}${title}</span><span class="time">${message.time}</span>`;
     //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
-    line += `<span class='url ${statusok}'><a href='${encodeURI(message.request.url)}' target='_blank'>${message.request.url}</a>${status}</span>`;
+    line += `<span id=${reqid}stat class='url ${statusok}'><a href='${encodeURI(message.request.url)}' target='_blank'>${message.request.url}</a><span class='sc' id=${reqid}txt>${status}</span></span>`;
     line += `<ul>${message.data.content}</ul>` + empty;
     line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode' id=${idc}>${JSON.stringify(message.request.data, null, 2)}</pre></details>`;
     //document.getElementById('ALL').innerHTML=line+document.getElementById('ALL').innerHTML;

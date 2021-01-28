@@ -373,11 +373,15 @@ let processDataSC = (state) => {
   if (state['qsIndData']==true) final = final && state.qsInd;
   if (state['analyticIndData']==true) final = final && state.analyticInd;
   if (state['ecIndData']==true) final= final && state.ecInd;
-  if (state['searchIndData']==false) final = true;
-  if (state['qsIndData']==false) final = true;
-  if (state['analyticIndData']==false) final = true;
-  if (state['ecIndData']==false) final= true;
-
+  console.log('final1: '+final);
+  if (state['searchIndData']!=undefined && state['searchIndData']==false) final = true;
+  console.log('final2: '+final);
+  if (state['qsIndData']!=undefined && state['qsIndData']==false) final = true;
+  console.log('final3: '+final);
+  if (state['analyticIndData']!=undefined && state['analyticIndData']==false) final = true;
+  console.log('final4: '+final);
+  if (state['ecIndData']!=undefined && state['ecIndData']==false) final= true;
+  console.log('final5: '+final);
   queries += `<h2 class="${!final?'validInd':'notvalidInd'}">Scenario ${!final?'properly':'NOT properly'} executed</h2>`;
   if (state.searchReport != '') {
     queries += `<hr><h2 class="${!state.searchInd?'validInd':'notvalidInd'}">Queries</h2>`;
