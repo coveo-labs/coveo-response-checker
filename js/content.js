@@ -157,6 +157,10 @@ if (chrome && chrome.runtime && chrome.runtime.onMessage) {
       //console.log('Got Download');
       downloadReport(request.name, request.text);
     }
+    if (request.type === 'downloadjson') {
+      //console.log('Got Download');
+      downloadJSON(request.name, request.text);
+    }
     if (request.type === 'enabled') {
       //console.log('enabled');
       //setTimeout( function() {addIds();},300);
@@ -171,9 +175,24 @@ if (chrome && chrome.runtime && chrome.runtime.onMessage) {
   );
 }
 
+
 function downloadReport(filename, text) {
   var element = document.createElement('a');
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+
+function downloadJSON(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(text));
   element.setAttribute('download', filename);
 
   element.style.display = 'none';

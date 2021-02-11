@@ -547,6 +547,18 @@ span.persistent {
   background-image: url(../images/download.svg);
   cursor: pointer;
 }
+#download-json {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 24px;
+  background-image: url(../images/json2.svg);
+  cursor: pointer;
+  float: right;
+    min-width: 30px;
+    height: 34px;
+    border-color: transparent;
+}
+
 .copy-example {
   background-position: left;
   padding-left: 25px;

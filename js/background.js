@@ -16,7 +16,7 @@ var tab_id = null;
 /* globals chrome */
 //const FILTER_SEARCH = { urls: ["*://*/rest/search/*", "*://*/search/*", "*://*/*/search/*", "*://*/*/CoveoSearch/*", "*://*/?errorsAsSuccess=1", "*://*/*&errorsAsSuccess=1*", "https://*/rest/search/v2/*", "https://*/rest/search/v2*", "https://*/coveo-search/v2*", "https://*/*/rest/search/v2*", "https://*/*/*/rest/search/v2*", "https://*/coveo/rest/v2*", "https://cloudplatform.coveo.com/rest/search/*", "*://platform.cloud.coveo.com/rest/search/v2/*", "https://search.cloud.coveo.com/rest/search/v2/*", "*://*/*/coveo/platform/rest/*", "*://*/coveo/rest/*"] };
 //const FILTER_ANALYTICS = { urls: ["https://*.cloud.coveo.com/*/analytics/collect*","https://*.cloud.coveo.com/*analytics*","https://*rest/coveoanalytics/*","https://*/rest/coveoanalytics/*","https://*/analytics/collect*","*://*/*coveo/rest/coveoanalytics/*", "*://*/rest/v15/analytics/*", "*://*/collect/*", "*://*/*/collect/*", "*://*/collect*", "*://*/*/collect*", "*://*/v1/analytics/search*", "*://usageanalytics.coveo.com/rest/*", "*://*/*/coveo/analytics/rest/*", "*://*/*/rest/ua/*", "*://*/rest/ua/*", "*://*/*/coveoanalytics/rest/*"] };
-const FILTER_SEARCH = { urls: ["*://*/rest/search/*", "*://*/search/*", "*://*/*/search/*", "*://*/*/CoveoSearch/*", "*://*/?errorsAsSuccess=1", "*://*/*&errorsAsSuccess=1*", "https://*/rest/search/v2/*", "https://*/rest/search/v2*", "https://*/coveo-search/v2*", "https://*/*/rest/search/v2*", "https://*/*/*/rest/search/v2*", "https://*/coveo/rest/v2*", "https://cloudplatform.coveo.com/rest/search/*", "*://platform.cloud.coveo.com/rest/search/v2/*", "https://search.cloud.coveo.com/rest/search/v2/*", "*://*/*/coveo/platform/rest/*", "*://*/coveo/rest/*"] };
+const FILTER_SEARCH = { urls: ["*://*/rest/search/*", "*://*/search/*", "*://*/*/search/*", "*://*/*/CoveoSearch/*", "*://*/?errorsAsSuccess=1", "*://*/*&errorsAsSuccess=1*", "https://*/rest/search/v2*", "https://*/coveo-search/v2*", "https://*/*/rest/search/v2*", "https://*/*/*/rest/search/v2*", "https://*/coveo/rest/v2*", "https://cloudplatform.coveo.com/rest/search/*", "*://platform.cloud.coveo.com/rest/search/v2/*", "https://search.cloud.coveo.com/rest/search/v2/*", "*://*/*/coveo/platform/rest/*", "*://*/coveo/rest/*"] };
 const FILTER_ANALYTICS = { urls: ["https://*/*analytics*","https://*/*collect*"]};
 
 let getTabId_Then = (callback) => {
@@ -332,7 +332,7 @@ let analyticChecks = [
   { title: 'Search', t: true, key: 'actionCauseS', m: true, url: '/search', prop: 'actionCause', value: { test: val => (val !== '') } },
   { sc: [{ id: 101}],title: 'Search', t: true, key: 'usingLocaleA', m: true, url: '/search', prop: 'language', value: { test: val => (val !== '') } },
   { sc: [{ id: 101}],title: 'Search', t: true, p: true, key: 'usingVisitorAS', m: true, url: '/search', prop: 'visitor', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'queryText', m: true, url: '/search', prop: 'queryText', check: { test: vals => ((vals['recommendation'] != '' && vals['recommendation'] != undefined) || (vals['actionCause'] != 'interfaceLoad' && vals['actionCause'] != 'recommendationInterfaceLoad')) }, value: { test: val => (val !== '') } },
+  { sc: [{ id: 101}],title: 'Search', t: true, key: 'queryText', m: true, url: '/search', prop: 'queryText', check: { test: vals => ((vals['recommendation'] != '' && vals['recommendation'] != undefined) || (vals['actionCause'] != 'interfaceLoad' && vals['actionCause'] != 'recommendationInterfaceLoad' && vals['actionCause'] != 'recommendation')) }, value: { test: val => (val !== '') } },
   { sc: [{ id: 101}],title: 'Search', t: true, key: 'userAgentA', m: true, url: '/search', prop: 'userAgent', value: { test: val => (val !== '') } },
   { sc: [{ id: 101}],title: 'Search', t: true, key: 'searchQueryUidA', m: true, url: '/search', prop: 'searchQueryUid', value: { test: val => (val !== '') } },
   { sc: [{ id: 101}],title: 'Search', t: true, key: 'advancedQuery', url: '/search', prop: 'advancedQuery', value: { test: val => (val !== '') } },
@@ -697,8 +697,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
   if (msg.type === 'getScenarios') {
     getTabId_Then(tabId => {
       getState_Then(state => {
-        let scenario = buildScenario(state, false);
-        sendResponse(scenario);
+        state.scenario = buildScenario(state, false);
+        saveState(state, tabId);
+        sendResponse(state.scenario);
       });
     });
     return true;
@@ -728,6 +729,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     getTabId_Then(tabId => {
       getState_Then(state => {
         //Add a navigation event to our logs
+        console.log('GotLocation: '+msg.url);
         let content = {};
         content.flag = false;
         //Check if we have searchToken or analyticsToken
@@ -837,6 +839,11 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     navigateto(msg.to);
   }
   else if (msg.type == 'download') {
+    getTabId_Then(tabId => {
+      chrome.tabs.sendMessage(tabId || null, msg);
+    });
+  }
+  else if (msg.type == 'downloadjson') {
     getTabId_Then(tabId => {
       chrome.tabs.sendMessage(tabId || null, msg);
     });
@@ -1474,7 +1481,7 @@ function getURLParams(url) {
 }
 
 let onSearchRequest = function (details) {
-  if (details.method == "OPTIONS" || details.method == "GET") return;
+  if (details.method == "OPTIONS" || (details.method == "GET" && details.url.indexOf('/querySuggest') == -1)) return;
   if (details.url.indexOf('cloud.coveo.com:443%22') != -1) return;
 
   if (details.url.indexOf('/html?uniqueId') > 0) return;
@@ -1635,10 +1642,13 @@ let addEcResults = function (state) {
 }
 
 
-
 let onAnalyticsRequest = function (details) {
   if (details.method == "OPTIONS") return;
   //Weird errors remove them
+  if (details.url.indexOf('googleanalytics-analytics.js') != -1) return;
+  if (details.url.indexOf('https://collect') != -1) return;
+  if (details.url.indexOf('%2Fcollect') != -1) return;
+  if (details.url.indexOf('/jserrors/')!=-1) return;
   if (details.url.indexOf('%22/coveo/rest/') != -1) return;
   if (details.url.indexOf('https://analytics.api.tooso') !=-1) return;
   if (details.url.indexOf('fmt=js') !=-1) return;
@@ -1646,7 +1656,7 @@ let onAnalyticsRequest = function (details) {
   if (details.url.indexOf('visitor_id=') !=-1) return;
   if (details.url.indexOf('aip=') !=-1) return;
   //We do not want to track Google GTM events were pa is not in there l&pa=detail&
-  if (details.url.startsWith('https://www.google-analytics') && details.url.indexOf('&pa=') == -1) return;
+  if ((details.url.startsWith('https://www.google-analytics') || details.url.startsWith('https://analytics.google.com/')) && details.url.indexOf('&pa=') == -1) return;
   getState_Then(state => {
     if (!state.enabledSearch) return;
     if (details.statusCode) {
@@ -1791,7 +1801,7 @@ let onAnalyticsRequest = function (details) {
     } else {
       let type = 'E Commerce';
       let google = false;
-      if (details.url.startsWith('https://www.google-analytics')) {
+      if (details.url.startsWith('https://www.google-analytics') || details.url.startsWith('https://analytics.google.com/')) {
         type += ' (Google GTM)';
         google = true;
       }

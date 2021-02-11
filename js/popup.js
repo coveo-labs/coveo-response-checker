@@ -62,8 +62,8 @@ function createReportHTML(title) {
   for (var i = 0; i < currentState.dev.length; i++) {
     let empty = "";
     let title = currentState.dev[i].data.title ? " - " + currentState.dev[i].data.title : '';
-    let status = currentState.dev[i].statusCode ? "<span class='sc'>statusCode: " + currentState.dev[i].statusCode + "</span>" : "";
-    let statusok = '';
+    let status = currentState.dev[i].statusCode ? "<span class='sc'>statusCode: " + currentState.dev[i].statusCode + "</span>" : "<span class='sc'>(no statusCode received)</span>";
+    let statusok = 'notvalidInd';
     if (currentState.dev[i].statusCode) {
       statusok = currentState.dev[i].statusCode == 200 ? "validInd" : "notvalidInd";
     }
@@ -303,6 +303,31 @@ function downloadReport() {
   }
 }
 
+//Download the report
+function downloadReportJSON() {
+  try {
+    let url = new URL(currentState.document_url);
+    let title = url.hostname.replaceAll('.',' ');
+    if (currentState.scen_enabled) {
+      title += ' - Scenario ' + currentState.scenarioId;
+    }
+    myDownloadTitle = title;
+    var dt = new NightwatchRenderer();
+    dt.items = currentState.record;
+    let json = dt.render(false, null, true);
+  
+    let filename = '';
+    SendMessage({
+      type: 'downloadjson',
+      name: myDownloadTitle + '.json',
+      text: json
+    });
+  }
+  catch (err) {
+    console.log('Oops, unable to download', err);
+  }
+}
+
 
 let processState = (data) => {
   currentState = data;
@@ -327,8 +352,11 @@ let processState = (data) => {
     $('#scenario').show();
     $('#instructions').hide();
     g_scenarios = data.scenario;
-    if (data.scenario == undefined) {
+    if (data.scenario == undefined || data.scenario.length==0) {
       SendMessage({ type: 'getScenarios' }, fillScenarios);
+    }
+    if (data.scenario && data.scenarioId=='') {
+      fillScenarios(data.scenario);
     }
     if (data.scenarioId!='') {
       updateScenario(data.scenarioId, data);
@@ -336,7 +364,7 @@ let processState = (data) => {
       $('#ScenarioSelector').val(data.scenarioId).change();
       $(`#ScenarioSelector option[value=${data.scenarioId}]`).attr('selected', 'selected');
     }
-    if (data.scenario != undefined) {
+    if (data.scenario != undefined && data.scenarioId!='') {
       processDataSC(data);
     }
 
@@ -373,15 +401,10 @@ let processDataSC = (state) => {
   if (state['qsIndData']==true) final = final && state.qsInd;
   if (state['analyticIndData']==true) final = final && state.analyticInd;
   if (state['ecIndData']==true) final= final && state.ecInd;
-  console.log('final1: '+final);
   if (state['searchIndData']!=undefined && state['searchIndData']==false) final = true;
-  console.log('final2: '+final);
   if (state['qsIndData']!=undefined && state['qsIndData']==false) final = true;
-  console.log('final3: '+final);
   if (state['analyticIndData']!=undefined && state['analyticIndData']==false) final = true;
-  console.log('final4: '+final);
   if (state['ecIndData']!=undefined && state['ecIndData']==false) final= true;
-  console.log('final5: '+final);
   queries += `<h2 class="${!final?'validInd':'notvalidInd'}">Scenario ${!final?'properly':'NOT properly'} executed</h2>`;
   if (state.searchReport != '') {
     queries += `<hr><h2 class="${!state.searchInd?'validInd':'notvalidInd'}">Queries</h2>`;
@@ -461,7 +484,7 @@ let processData = (state) => {
   dt.items = state.record;
   //Add the tests to the nightwatch file
   let tests = createTests(state);
-  document.getElementById('Nightwatch').innerHTML = dt.render(false, tests);
+  document.getElementById('Nightwatch').innerHTML = dt.render(false, tests, false);
   //Add the tests to the nightwatch file
 
   //document.getElementById('Nightwatch').innerHTML = nightwatch;
@@ -594,6 +617,11 @@ function reset() {
   document.getElementById('scenarioResults').innerHTML = '';
   $('#setScenario input').prop('checked', false);
   $('#setSearchTracker input').prop('checked', false);
+  $('#recording').hide();
+  $('#copyNightwatch').hide();
+  $('#loading').hide();
+  $('#globalReport').hide();
+  $('#scenario').hide();
 
   SendMessage('reset', getState);
   //window.close();
@@ -619,6 +647,7 @@ function changeUI(enable, message = true) {
   if (enable) {
     $('#recording').show();
     $('#download-global').show();
+    $('#download-json').show();
     $('#instructions').hide();
     $('#loading').hide();
     if (message) {
@@ -730,6 +759,10 @@ document.addEventListener('DOMContentLoaded', function () {
   $('#download-global').hide();
   $('#download-global').click(() => {
     downloadReport();
+  });
+  $('#download-json').hide();
+  $('#download-json').click(() => {
+    downloadReportJSON();
   });
   $('#btnscenario').click((e) => {
     e.preventDefault();

@@ -240,7 +240,7 @@ TestRecorder.TestCase.prototype.append = function (o) {
     //console.log('Selector: appended => '+JSON.stringify(o));
   } catch (e) { }
   chrome.runtime.sendMessage({ action: "append", obj: o });
-  console.log('Appending');
+  console.log('Appending'+JSON.stringify(o));
 };
 
 TestRecorder.TestCase.prototype.peek = function () {

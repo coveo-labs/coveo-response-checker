@@ -37,6 +37,7 @@ EventTypes.KeyPress = 23;
 
 function NightwatchRenderer() {
   this.document = '';
+  this.json = [];
   this.title = "Testcase";
   this.items = null;
   this.history = [];
@@ -134,9 +135,10 @@ NightwatchRenderer.prototype.dispatch = d;
 
 var cc = EventTypes;
 
-NightwatchRenderer.prototype.render = function (with_xy, tests) {
+NightwatchRenderer.prototype.render = function (with_xy, tests, json) {
   this.with_xy = with_xy;
   var etypes = EventTypes;
+  this.json = [];
   //this.document.open();
   //this.document.write("<" + "pre" + ">");
   this.document += "<" + "pre" + " class=mycode id='NightwatchCode' >";
@@ -170,7 +172,7 @@ NightwatchRenderer.prototype.render = function (with_xy, tests) {
       //continue;
     }
     if (item.type == etypes.MouseUp && last_down) {
-      if (last_down.x == item.x && last_down.y == item.y) {
+      if (Math.floor(last_down.x) == Math.floor(item.x) && Math.floor(last_down.y) == Math.floor(item.y)) {
         forget_click = false;
         //Always use the mousedown event
         item = last_down;
@@ -229,7 +231,7 @@ NightwatchRenderer.prototype.render = function (with_xy, tests) {
     if (item.type == etypes.Click && last_up) {
       //If mouseup is defined, take that instead of the current click, if they are on the same position
       //Sinde mouse up is triggering click now we can discard this one
-      if ((last_up.x == item.x && last_up.y == item.y) || (item.x == undefined)) {
+      if ((Math.floor(last_up.x) == Math.floor(item.x) && Math.floor(last_up.y) == Math.floor(item.y)) || (item.x == undefined)) {
         console.log('Selector: remove onclick because of mouseup');
         //item = last_up;
         //this[this.dispatch[etypes.Click]](item);
@@ -262,7 +264,11 @@ NightwatchRenderer.prototype.render = function (with_xy, tests) {
   //this.document.write("<" + "/" + "pre" + ">");
   this.document += "<" + "/" + "pre" + ">";
   //this.document.close();
+  if (json) {
+    return JSON.stringify(this.json);
+  } else {
   return this.document;
+  }
 };
 
 NightwatchRenderer.prototype.writeHeader = function () {
@@ -322,6 +328,7 @@ NightwatchRenderer.prototype.startUrl = function (item) {
   this.stmt("client.pause(DEFAULT_TIMEOUT);", 3);
   this.stmt('await client.execute(fs.readFileSync("src/ajaxListener.js").toString());', 2);
   this.stmt("client.pause(DEFAULT_TIMEOUT);", 3);
+  this.json.push({command:'OPEN', content:url});
 
 };
 
@@ -329,6 +336,7 @@ NightwatchRenderer.prototype.openUrl = function (item) {
   var url = this.pyrepr(this.rewriteUrl(item.url));
   this.stmt("client.url('" + item.width + ", " + item.height + "');", 3);
   this.stmt("client.pause(DEFAULT_TIMEOUT);", 3);
+  this.json.push({command:'OPEN', content:url});
 };
 
 NightwatchRenderer.prototype.pageLoad = function (item) {
@@ -456,11 +464,13 @@ NightwatchRenderer.prototype.click = function (item) {
       this.stmt("await mypage.c_moveToElement(" + selector + ",10,10,'xpath');", 3);
       this.stmt("await mypage.c_click(" + selector + ",'xpath');", 3);
       this.stmt("await mypage.c_Pause();", 3);
+      this.json.push({command:'CLICK', selector:selector, type:'XPATH'});
 
     } else {
       this.stmt("await mypage.c_moveToElement(" + selector + ",10,10);", 3);
       this.stmt("await mypage.c_click(" + selector + ");", 3);
       this.stmt("await mypage.c_Pause();", 3);
+      this.json.push({command:'CLICK', selector:selector, type:'CSS'});
 
     }
 
@@ -497,6 +507,8 @@ NightwatchRenderer.prototype.keypress = function (item) {
   this.stmt('await client.clearValue("' + selector + '");', 3);
   this.stmt('await mypage.c_setValue("' + selector + '", "' + text + '");', 3);
   this.stmt("await mypage.c_Pause();", 3);
+  this.json.push({command:'SETVALUE', selector:selector, content:text, type:'CSS'});
+  this.json.push({command:'ENTER', selector:'', content:'', type:'CSS'});
   /*this.stmt('client.keys(client.Keys.ENTER);',3);
   this.stmt("client.pause(DEFAULT_TIMEOUT);",3);*/
 };
@@ -515,6 +527,8 @@ NightwatchRenderer.prototype.change = function (item) {
   this.stmt('await mypage.c_setValue("' + selector + '", "' + text + '");', 3);
   this.stmt("await mypage.c_Pause();", 3);
   this.stmt("await mypage.c_Pause();", 3);
+  this.json.push({command:'SETVALUE', selector:selector, content:text, type:'CSS'});
+  this.json.push({command:'ENTER', selector:'', content:'', type:'CSS'});
 };
 
 NightwatchRenderer.prototype.submit = function (item) {

@@ -117,10 +117,15 @@ class ElementSelector {
   }
 
   testUniqueElementWithinParent(element, selector) {
+    try {
     if (element.parentNode!=null) {
     let elementList = element.parentNode.querySelectorAll(selector);
     return (elementList.length === 1) && (elementList[0].isSameNode(element));
     } else return false;
+  } catch(e)
+  {
+    return false;
+  }
   }
 
   getAllSelectors(element) {

@@ -461,8 +461,8 @@ backgroundPageConnection.onMessage.addListener(function (message) {
   let enableSc = $('#setScenario input').prop('checked') ? true : false;
   if (message.one) {
     //We have a single record which we only need to update the statuscode
-    let status = message.one.statusCode ? "statusCode: " + message.one.statusCode + "" : "";
-    let statusok = '';
+    let status = message.one.statusCode ? "statusCode: " + message.one.statusCode + "" : "(no statusCode received)";
+    let statusok = 'notvalidInd';
     if (message.one.statusCode) {
       statusok = message.one.statusCode == 200 ? "validInd" : "notvalidInd";
     }
@@ -488,8 +488,8 @@ backgroundPageConnection.onMessage.addListener(function (message) {
       let idc = id + 'c';
       let title = message.all[i].data.title ? " - " + message.all[i].data.title : '';
       let reqid = message.all[i].req+(message.all[i].data.title ? "" + message.all[i].data.title : '');
-      let status = message.all[i].statusCode ? `statusCode: ` + message.all[i].statusCode + "" : "";
-      let statusok = '';
+      let status = message.all[i].statusCode ? `statusCode: ` + message.all[i].statusCode + "" : "(no statusCode received)";
+      let statusok = 'notvalidInd';
       if (message.all[i].statusCode) {
         statusok = message.all[i].statusCode == 200 ? "validInd" : "notvalidInd";
       }
@@ -513,8 +513,8 @@ backgroundPageConnection.onMessage.addListener(function (message) {
     let idc = id + 'c';
     let title = message.data.title ? " - " + message.data.title : '';
     let reqid = message.req+(message.data.title ? "" + message.data.title : '');
-    let status = message.statusCode ? `<span class='sc' id=${message.req}txt>statusCode: ` + message.statusCode + "</span>" : "";
-    let statusok = '';
+    let status = message.statusCode ? `<span class='sc' id=${message.req}txt>statusCode: ` + message.statusCode + "</span>" : `<span class='sc' id=${message.req}txt>(no statusCode received)</span>`;
+    let statusok = 'notvalidInd';
     if (message.statusCode) {
       statusok = message.statusCode == 200 ? "validInd" : "notvalidInd";
     }
