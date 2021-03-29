@@ -466,7 +466,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
     if (message.one.statusCode) {
       statusok = message.one.statusCode == 200 ? "validInd" : "notvalidInd";
     }
-    let newclass = `${!message.one.data.flag && message.one.statusCode ? "validIndB" : "notvalidIndB"}`;
+    let newclass = `${!message.one.data.oneisbad && message.one.statusCode ? "validIndB" : "notvalidIndB"}`;
     let title = message.one.data.title ? " - " + message.one.data.title : '';
     let reqid = message.one.req+(message.one.data.title ? "" + message.one.data.title : '');
     let id = '#'+reqid+'';
@@ -493,7 +493,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
       if (message.all[i].statusCode) {
         statusok = message.all[i].statusCode == 200 ? "validInd" : "notvalidInd";
       }
-      let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.all[i].data.flag && message.all[i].statusCode ? "validIndB" : "notvalidIndB"}'>${message.all[i].request.type}${title}</span><span class="time">${message.all[i].time}</span>`;
+      let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.all[i].data.oneisbad && message.all[i].statusCode ? "validIndB" : "notvalidIndB"}'>${message.all[i].request.type}${title}</span><span class="time">${message.all[i].time}</span>`;
       //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
       line += `<span id=${reqid}stat class='url ${statusok}'><a href='${encodeURI(message.all[i].request.url)}' target='_blank'>${message.all[i].request.url}</a><span class='sc' id=${reqid}txt>${status}</span></span>`;
       line += `<ul>${message.all[i].data.content}</ul>` + empty;
@@ -518,7 +518,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
     if (message.statusCode) {
       statusok = message.statusCode == 200 ? "validInd" : "notvalidInd";
     }
-    let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.data.flag && message.statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${message.request.type}${title}</span><span class="time">${message.time}</span>`;
+    let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.data.oneisbad && message.statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${message.request.type}${title}</span><span class="time">${message.time}</span>`;
     //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
     line += `<span id=${reqid}stat class='url ${statusok}'><a href='${encodeURI(message.request.url)}' target='_blank'>${message.request.url}</a><span class='sc' id=${reqid}txt>${status}</span></span>`;
     line += `<ul>${message.data.content}</ul>` + empty;

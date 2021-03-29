@@ -68,7 +68,7 @@ function createReportHTML(title) {
       statusok = currentState.dev[i].statusCode == 200 ? "validInd" : "notvalidInd";
     }
 
-    let line = `<span class='spacing'></span><span class='type ${!currentState.dev[i].data.flag && currentState.dev[i].statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${currentState.dev[i].request.type}${title}</span><span class="time">${currentState.dev[i].time}</span>`;
+    let line = `<span class='spacing'></span><span class='type ${!currentState.dev[i].data.oneisbad && currentState.dev[i].statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${currentState.dev[i].request.type}${title}</span><span class="time">${currentState.dev[i].time}</span>`;
     //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
     line += `<span class='url ${statusok}'><a href='${encodeURI(currentState.dev[i].request.url)}' target='_blank'>${currentState.dev[i].request.url}</a>${status}</span>`;
     line += `<ul>${currentState.dev[i].data.content}</ul>` + empty;

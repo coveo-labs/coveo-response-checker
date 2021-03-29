@@ -1006,7 +1006,7 @@ TestRecorder.Recorder.prototype.oncontextmenu = function (e) {
 TestRecorder.Recorder.prototype.onkeypress = function (e) {
   //console.log('Selector: onkeypress keycode => '+e.key);
   var e = new TestRecorder.Event(e);
-  if (e.shiftkey() && e.keychar() == "C") {
+  /*if (e.shiftkey() && e.keychar() == "C") {
     // TODO show comment box here
   }
   if (e.shiftkey() && e.keychar() == "S") {
@@ -1014,7 +1014,7 @@ TestRecorder.Recorder.prototype.onkeypress = function (e) {
     e.stopPropagation();
     e.preventDefault();
     return false;
-  }
+  }*/
 
   var last = recorder.testcase.peek();
   if (last.type == TestRecorder.EventTypes.KeyPress) {

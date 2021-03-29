@@ -100,6 +100,18 @@ function reactOnBeacon(event) {
     data: JSON.stringify(event.data.content)
   });
 }
+if (event.data.action=='resetEvents') {
+  console.log('resetEvents received, sending to background');
+  chrome.runtime.sendMessage({
+    action: "resetEvents"
+  });
+}
+if (event.data.action=='getEvents') {
+  console.log('getEvents received, sending to background');
+  chrome.runtime.sendMessage({
+    action: "getEvents"
+  });
+}
 }
 
 window.addEventListener("message", reactOnBeacon, false);
@@ -134,7 +146,7 @@ var script = document.createElement('script');
 script.textContent = addConsoleTracker();
 (document.head || document.documentElement).appendChild(script);
 
-let SendMessage = (parameters) => {
+let SendMessageNow = (parameters) => {
   setTimeout(() => {
     try {
       chrome.runtime.sendMessage(parameters);
@@ -153,6 +165,19 @@ if (chrome && chrome.runtime && chrome.runtime.onMessage) {
     //chrome.runtime.onMessage.addListener(
     //function (request/*, sender, sendResponse*/) {
     //console.log("In OnMessage");
+    if (request.action === 'sent_events') {
+      console.log('got sent_events');
+      
+      if (document.getElementById('myRequestResult')!=null) document.getElementById('myRequestResult').remove();
+
+      var element = document.createElement('a');
+      element.id='myRequestResult';
+
+      element.setAttribute('href', '' + JSON.stringify(request.events));
+    
+      element.style.display = 'none';
+      document.body.appendChild(element);
+    }
     if (request.type === 'download') {
       //console.log('Got Download');
       downloadReport(request.name, request.text);

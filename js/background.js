@@ -725,13 +725,69 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     });
     return true;
   }
+  if (msg.action === 'resetEvents') {
+    //Received from Nightwatch script
+    console.log('Received resetEvents');
+    getState_Then(state => {
+      state.dev = [];
+      saveState(state, state.tabId);
+    });
+
+    return true;
+  }
+  if (msg.action === 'getEvents') {
+    //Received from Nightwatch script
+    console.log('Received getEvents');
+    getTabId_Then(tabId => {
+      getState_Then(state => {
+        //Clean up the state.dev
+        let info = [];
+        state.dev.map((ev) => {
+          let type = ev.request.type;
+          let subtitle = ev.data.title ? ev.data.title : '';
+          let status = ev.statusCode ? ev.statusCode : "(no statusCode received)";
+          let statusok = false;
+          if (ev.statusCode) {
+            statusok = ev.statusCode == 200 ? true : false;
+          }
+          let oneisbad = ev.data.oneisbad;
+          let url = ev.request.url;
+          let postdata = ev.request.data;
+          let detail = {};
+          detail['type']=type;
+          detail['subtype']=subtitle;
+          detail['statusCode']=status;
+          detail['status']=statusok;
+          detail['oneisbad']=oneisbad;
+          detail['finalcheck']=statusok && !oneisbad;
+          detail['url']=url;
+          detail['postdata']=postdata;
+          //Push only unique events (type, subtype)
+          let exists=false;
+          info.map((inf)=> {
+             if (inf['type']==type && inf['subtype']==subtitle) {
+               exists=true;
+             }
+          });
+          if (!exists || msg.unique==false) info.unshift(detail);
+        
+        });
+        chrome.tabs.sendMessage(tabId, {
+          action: "sent_events",
+          events: info
+        });
+        //sendResponse({ active: state.recactive, empty: state.recempty });
+      });
+    });
+    return true;
+  }
   if (msg.action === 'gotLoc') {
     getTabId_Then(tabId => {
       getState_Then(state => {
         //Add a navigation event to our logs
         console.log('GotLocation: '+msg.url);
         let content = {};
-        content.flag = false;
+        content.oneisbad = false;
         //Check if we have searchToken or analyticsToken
 
         content.content = `<li class='${(state['searchToken']!=undefined) ? "validInd" : "notvalidInd"} notmandatory' style='width: auto !important;'>searchToken<span class='propvalue'><pre class='code'>${state['searchToken']}</pre></span></li>`;
@@ -898,7 +954,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           state.ecResults = {};
           state.scenario = buildScenario(state);
           let content = {};
-          content.flag = false;
+          content.oneisbad = false;
           content.content = '';
           //Do we need to reset the values?
           resetPersistentValuesScenario(state, state.scenarioId);
@@ -1350,7 +1406,7 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
         }
         //Check if curtitle != title, if so, add content to array
         if (curtitle!='' && curtitle!=title && curcontentfordev!='') {
-           ecresultsfordev.push({ content: curcontentfordev, flag: oneisbadSingle, title: curtitle });
+           ecresultsfordev.push({ content: curcontentfordev, oneisbad: oneisbadSingle, title: curtitle });
            oneisbadSingle = false;
            curcontentfordev = '';
         }
@@ -1458,10 +1514,10 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
   }
   saveState(state, state.tabId);
   if (curcontentfordev!='' && curtitle!='') {
-    ecresultsfordev.push({ content: curcontentfordev, flag: oneisbadSingle, title: curtitle });
+    ecresultsfordev.push({ content: curcontentfordev, oneisbad: oneisbadSingle, title: curtitle });
     return ecresultsfordev;
   } else {
-    return { content: curcontentfordev, flag: oneisbadSingle, title: curtitle };
+    return { content: curcontentfordev, oneisbad: oneisbadSingle, title: curtitle };
   }
 }
 
@@ -1508,6 +1564,7 @@ let onSearchRequest = function (details) {
           break;
         }
       }
+      saveState(state, state.tabId);
       return;
     }
     let thisState = {};
@@ -1682,6 +1739,7 @@ let onAnalyticsRequest = function (details) {
       } else {
         currentResponse = '';
       }
+      saveState(state, state.tabId);
       return;
       //update dev list in chrome devtools
     }
