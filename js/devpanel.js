@@ -412,7 +412,7 @@ backgroundPageConnection.postMessage({
 document.addEventListener('DOMContentLoaded', function () {
   // Handle clicks on slide-toggle buttons
   var manifestData = chrome.runtime.getManifest();
-  $('#myTitle').text("Coveo Response Checker " + manifestData.version);
+  $('#myTitle').text("Coveo Request Checker " + manifestData.version);
   /*  document.querySelectorAll("#tabs").forEach(function(a){
       a.addEventListener("click", function(e){
         fixTabs(e.target.id);return false;
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 var backgroundPageConnection = chrome.runtime.connect({
-  name: "CoveoResponseCheckerPage"
+  name: "CoveoRequestCheckerPage"
 });
 
 backgroundPageConnection.postMessage({
@@ -496,7 +496,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
       let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.all[i].data.oneisbad && message.all[i].statusCode ? "validIndB" : "notvalidIndB"}'>${message.all[i].request.type}${title}</span><span class="time">${message.all[i].time}</span>`;
       //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
       line += `<span id=${reqid}stat class='url ${statusok}'><a href='${encodeURI(message.all[i].request.url)}' target='_blank'>${message.all[i].request.url}</a><span class='sc' id=${reqid}txt>${status}</span></span>`;
-      line += `<ul>${message.all[i].data.content}</ul>` + empty;
+      line += `<details class=code>  <summary>Parameter validation</summary><ul>${message.all[i].data.content}</ul></details>` + empty;
       line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode' id=${idc}>${JSON.stringify(message.all[i].request.data, null, 2)}</pre></details>`;
       //document.getElementById('ALL').innerHTML=line+document.getElementById('ALL').innerHTML;
       if (message.all[i].sc==true && enableSc) {
@@ -521,7 +521,7 @@ backgroundPageConnection.onMessage.addListener(function (message) {
     let line = `<span class='spacing'></span><span id=${reqid} class='type ${!message.data.oneisbad && message.statusCode == 200 ? "validIndB" : "notvalidIndB"}'>${message.request.type}${title}</span><span class="time">${message.time}</span>`;
     //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
     line += `<span id=${reqid}stat class='url ${statusok}'><a href='${encodeURI(message.request.url)}' target='_blank'>${message.request.url}</a><span class='sc' id=${reqid}txt>${status}</span></span>`;
-    line += `<ul>${message.data.content}</ul>` + empty;
+    line += `<details class=code>  <summary>Parameter validation</summary><ul>${message.data.content}</ul></details>` + empty;
     line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode' id=${idc}>${JSON.stringify(message.request.data, null, 2)}</pre></details>`;
     //document.getElementById('ALL').innerHTML=line+document.getElementById('ALL').innerHTML;
     if (message.sc==true && enableSc) {

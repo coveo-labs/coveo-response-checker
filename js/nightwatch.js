@@ -277,7 +277,7 @@ NightwatchRenderer.prototype.writeHeader = function () {
     "/*==============================================================================*/",
     0
   );
-  this.text("/* CoveoResponseChecker generated " + date + " */", 0);
+  this.text("/* CoveoRequestChecker generated " + date + " */", 0);
   this.text(
     "/*==============================================================================*/",
     0

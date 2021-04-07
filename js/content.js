@@ -7,22 +7,7 @@ var expanded = false;
 function addConsoleTracker() {
   let tracker_script = `
   
-  (function () {
-    
-
-		if (window.console && console.log) {
-			var oldConsole = console.log;
-			console.log = function () {
-				var message = Array.prototype.slice.apply(arguments).join(' ');
-				if (message.indexOf('A search was triggered, but no analytics') !== -1 || message.indexOf('warnAboutSearchEvent') !== -1) {
-					$('body').append('<div id=myanalyticsfailure></div>');
-					Array.prototype.unshift.call(arguments, 'MAYDAY: ');
-				}
-				oldConsole.apply(this, arguments);
-			};
-    }
-    
-  })();
+  
   
 let decodeRaw = function (raw) {
   let rawString = '';

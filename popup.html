@@ -18,7 +18,7 @@
   </head>
 
   <body class="CoveoAdminInterface admin coveo-styleguide">
-    <header class="header bg-polygon">
+    <header class="header bg-polygon" style="height: 56px; min-height: 56px;">
       <div class="header-section">
         <a href="http://coveo.com" target="_blank">
           <div class="admin-logo">
@@ -166,13 +166,17 @@
       </div>
 
       <div id="instructions">
-        How to use this tool:<br /><br />
+       
+
+<h2>Instructions</h2>
+<p>
+  How to use this tool:<br /><br />
         If you want to start all over: hit <b>RESET</b><br />
         <br />
         <ul>
           <li>
-            Step 1. Open Chrome Dev Tools window, activate tab Coveo Response
-            Checker.
+            Step 1. Open Chrome Dev Tools window, activate tab <b>Coveo Request
+            Checker</b>.
           </li>
           <li>Step 2. Enable the Tracker.</li>
           <li>
@@ -218,6 +222,7 @@
         <img src="/images/copy.svg" height="20px" />
 
         <br />
+</p>
       </div>
       <div id="loading" class="loading-prompt">
         <div id="loadTitle">Currently loading. Please wait.</div>
@@ -231,7 +236,7 @@
       <div id="scenario">
         Select your scenario to test:
         <select id="ScenarioSelector"></select><br />
-        <div id="scenarioInstructions"></div>
+        <div id="scenarioInstructions">Instructions:<br><div class="InstructionSet" id="InstructionSet"></div></div>
         <div
              id="scenarioResults"
              class="crs tab-content"
@@ -304,7 +309,7 @@
           <table style="width: auto; display: inline">
             <tr>
               <td class="valid notmandatory nobord"></td>
-              <td class="notvalid notmandatory nobord"></td>
+              <td class="notvalidNotMandatory notmandatory nobord"></td>
               <td class="nobord">Not mandatory</td>
               <td class="valid nobord"></td>
               <td class="notvalid nobord"></td>

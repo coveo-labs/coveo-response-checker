@@ -53,6 +53,8 @@ function pad(t) {
 let defaultECResults = ['add', 'remove', 'detail', 'pageview', 'click', 'purchase', 'event','impression'];
 
 let translation = {
+  searchHub: 'originLevel1',
+  tab: 'originLevel2',
   eventCategory: 'ec',
   eventAction: 'ea',
   eventLabel: 'el',
@@ -65,11 +67,11 @@ let translation = {
   hitType: 't',
   pageViewId: 'pid',
   encoding: 'de',
-  location: 'dl',
-  referrer: 'dr',
+  currentPage: 'dl',
+  referringPage: 'dr',
   screenColor: 'sd',
   screenResolution: 'sr',
-  title: 'dt',
+  pageTitle: 'dt',
   userAgent: 'ua',
   language: 'ul',
   eventId: 'z',
@@ -84,8 +86,27 @@ let translation = {
   coupon: 'cc',
   position: 'ps',
   action: 'pa',
-  list: 'pal',
+  productActionList: 'pal',
   listSource: 'pls',
+  productSKU: 'pr1id',
+  productName: 'pr1nm',
+  productPrice: 'pr1pr',
+  productQuantity: 'pr1qt',
+  productPosition: 'pr1ps',
+  productBrand: 'pr1br',
+  productCategory: 'pr1ca',
+  productVariant: 'pr1va',
+  productCoupon: 'pr1cc',
+  productImpressionListName: 'il1nm',
+  productImpressionName: 'il1pi1nm',
+  productImpressionSKU: 'il1pi1id',
+  productImpressionPrice: 'il1pi1pr',
+  productImpressionQuantity: 'il1pi1qt',
+  productImpressionPosition: 'il1pi1ps',
+  productImpressionBrand: 'il1pi1br',
+  productImpressionCategory: 'il1pi1ca',
+  productImpressionVariant: 'il1pi1va'
+
 }
 
 let getTranslation = (key) => {
@@ -124,17 +145,35 @@ const transactionActionsKeysMapping: { [name: string]: string } = {
 //Use the same parent if the tests need to check for the same persistent values
 //When resetvalues is being found the persistent values will be cleared
 let scenarios = [
-  { title: 'ECommerce 1. Home Page view (anonymous)', id: 1, parent: 1, resetvalues: true, instructions: 'Refresh homepage.<br>Make sure you are not logged in.' },
+  { title: 'ECommerce 1.   Home Page view (anonymous)', id: 1, parent: 1, resetvalues: true, instructions: 'Refresh homepage.<br>Make sure you are not logged in.' },
   { title: 'ECommerce 1.1. Recommendations on Home Page', id: 11, parent: 1, instructions: 'Recommendations are displayed (with prices) on the home page.<br>An Impression event must be sent.' },
   { title: 'ECommerce 1.2. Click on 1st Recommendation Quickview Home Page', id: 12, parent: 1, instructions: 'Click on the first <b>Quickview</b> in the Recommended products section.' },
   { title: 'ECommerce 1.3. Click on 1st Recommendation Add To Cart Home Page', id: 13, parent: 1, instructions: 'Click on the first <b>Add To Cart</b> in the Recommended products section.' },
   { title: 'ECommerce 1.4. Click on 2nd Recommendation Quickview Home Page', id: 14, parent: 1, instructions: 'Click on the second <b>Quickview</b> in the Recommended products section.' },
-  { title: 'ECommerce 1.5. Click on 2nd Recommendation Add To Cart Home Page', id: 13, parent: 1, instructions: 'Click on the second <b>Add To Cart</b> in the Recommended products section.' },
+  { title: 'ECommerce 1.5. Click on 2nd Recommendation Add To Cart Home Page', id: 15, parent: 1, instructions: 'Click on the second <b>Add To Cart</b> in the Recommended products section.' },
   { title: 'ECommerce 1.6. Click on 2nd Recommendation Hyperlink', id: 16, parent: 1, instructions: 'Click on the second recommendation in the Recommended products section.' },
-  { title: '2. Home Page view', id: 2, parent: 2, resetvalues: true, instructions: 'Refresh homepage.' },
-  { title: '2.1. Click on Recommendation Home Page', id: 21, parent: 2, instructions: 'Click on first recommended product.<br>Add to Cart.' },
+  { title: 'ECommerce 2.   PDP Product detail page', id: 2, parent: 2, instructions: 'Click on Product Detail page link.<br>Refresh the page.' },
+  { title: 'ECommerce 2.1  PDP Product detail page, Add To Cart', id: 21, parent: 2, instructions: 'Click on Product Detail page link.<br>Refresh the page.<br>Click on <b>Add To Cart</b>, select quantity 1.<br><b>If you have a discounted price the pr1pr should have the discounted price</b>' },
+  { title: 'ECommerce 2.2. PDP, Click on 1st Recommendation Quickview', id: 22, parent: 2, instructions: 'Click on the first <b>Quickview</b> in the Recommended products section.' },
+  { title: 'ECommerce 2.3. PDP, Click on 1st Recommendation Add To Cart', id: 23, parent: 2, instructions: 'Click on the first <b>Add To Cart</b> in the Recommended products section.' },
+  { title: 'ECommerce 2.4. PDP, Click on 2nd Recommendation Quickview', id: 24, parent: 2, instructions: 'Click on the second <b>Quickview</b> in the Recommended products section.' },
+  { title: 'ECommerce 2.5. PDP, Click on 2nd Recommendation Add To Cart', id: 25, parent: 2, instructions: 'Click on the second <b>Add To Cart</b> in the Recommended products section.' },
+  { title: 'ECommerce 2.6. PDP, Click on 2nd Recommendation Hyperlink', id: 26, parent: 2, instructions: 'Click on the second recommendation in the Recommended products section.' },
+  { title: 'ECommerce 3.   Search Page view (anonymous)', id: 3, parent: 3, resetvalues: true, instructions: 'Goto Search Page, execute a search<br>Make sure you are not logged in.' },
+  { title: 'ECommerce 3.1. Search, Click on 1st Quickview ', id: 31, parent: 3, instructions: 'Click on the first <b>Quickview</b> in the search results.' },
+  { title: 'ECommerce 3.2. Search, Click on 1st Add To Cart', id: 32, parent: 3, instructions: 'Click on the first <b>Add To Cart</b> in the search results.' },
+  { title: 'ECommerce 3.3. Search, Click on page 2, 2nd Quickview', id: 33, parent: 3, instructions: 'Goto page 2, Click on the second <b>Quickview</b> in the search results.' },
+  { title: 'ECommerce 3.4. Search, Click on page 2, 2nd Add To Cart', id: 34, parent: 3, instructions: 'Goto page 2, Click on the second <b>Add To Cart</b> in the search results.' },
+  { title: 'ECommerce 3.5. Search, Click on page 2, 2nd Hyperlink', id: 35, parent: 3, instructions: 'Goto page 2, Click on the second search result.' },
+  { title: 'ECommerce 3.6. Search, Click on page 2, 2nd Hyperlink WITH /click', id: 36, parent: 3, instructions: 'Goto page 2, Click on the second search result.<br><b>Only to be used when the <i>/click</i> endpoint is used.</b>' },
+  { title: 'ECommerce 4.1  Cart page, increase 1 Item', id: 41, parent: 4, instructions: 'Click on Cart Page.<br>Increase 1 Item to cart' },
+  { title: 'ECommerce 4.2  Cart page, decrease 1 Item', id: 42, parent: 4, instructions: 'Click on Cart Page.<br>Decrease 1 Item (one who has 2) to cart' },
+  { title: 'ECommerce 4.3  Cart page, remove 1 Item', id: 43, parent: 4, instructions: 'Click on Cart Page.<br>Remove 1 Item with count=1 from cart' },
+  { title: 'ECommerce 4.4  Cart page, purchase', id: 44, parent: 4, instructions: 'Click on Cart Page.<br>Click on Purchase' },
+
   { title: 'Normal 10. Home Page view', id: 10, parent: 1, resetvalues: true, instructions: 'Refresh homepage.<br>' },
   { title: 'Normal 10.1 Home Page Query Suggest', id: 101, parent: 1, instructions: 'Start typing in the global searchbox.<br>Hit enter to start searching.' },
+  { title: 'Normal 10.2 Query, open 2nd result', id: 102, parent: 1, instructions: 'After previous step, click on 2nd result' },
 ]
 
 //For search and plan
@@ -147,48 +186,55 @@ let scenarios = [
 //pp ==> persistent during page view
 //ex ==> Expected (note to the end user), default = 'Not empty'
 let searchChecks = [
-  { sc: [{ id: 101}],key: 'usingSearchHub', t: true, m: true, url: '', prop: 'searchHub', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'usingTab', t: true, m: true, url: '', prop: 'tab', check: { test: vals => (vals['recommendation'] == undefined || vals['recommendation'] == '') }, value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'usingLocale', t: true, m: true, url: '', prop: 'locale', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'usingVisitorId', p: true, t: true, m: true, url: '', prop: 'visitorId', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'q', t: true, m: true, url: '', prop: 'q', value: { test: val => (val != '') } },
-  { sc: [{ id: 101}],key: 'aq', t: true, url: '', prop: 'aq', value: { test: val => (val != '') } },
-  { sc: [{ id: 101}],key: 'cq', t: true, url: '', prop: 'cq', value: { test: val => (val != '') } },
-  { sc: [{ id: 101}],key: 'usingPipeline', t: true, url: '', prop: 'pipeline', value: { test: val => (val == '') }, ex:'Should be empty' },
-  { sc: [{ id: 101}],key: 'recommendation', t: true, url: '', prop: 'recommendation', value: { test: val => (val == '') }, ex:'Should be empty with normal search' },
-  { sc: [{ id: 101}],key: 'usingContext', t: true, url: '', prop: 'context', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'NOT_usingDQ', t: true, url: '', prop: 'dq', default: false, value: { test: val => (val == '') } ,ex:'Should be false, decreases performance'},
-  { sc: [{ id: 101}],key: 'NOT_usingLQ', t: true, url: '', prop: 'lq', default: false, value: { test: val => (val == '') } , ex:'Should be false, decreases performance'},
-  { sc: [{ id: 101}],key: 'NOT_usingFilterField', t: true, url: '', prop: 'filterField', default: false, value: { test: val => (val == '') } ,ex:'Should be false, decreases performance'},
-  { sc: [{ id: 101}],key: 'NOT_usingPartialMatch', t: true, url: '', prop: 'partialMatch', default: false, value: { test: val => (val == false) } ,ex:'Should be false, decreases performance'},
-  { sc: [{ id: 101}],key: 'NOT_usingWildcards', t: true, url: '', prop: 'enableWildcards', default: false, value: { test: val => (val == false) } ,ex:'Should be false, decreases performance'},
-  { sc: [{ id: 101}],key: 'NOT_usingDuplicateFilter', t: true, url: '', prop: 'enableDuplicateFiltering', default: false, value: { test: val => (val == false) } ,ex:'Should be false, decreases performance'},
-  { sc: [{ id: 101}],key: 'usingCommerce', t: true, url: '', prop: 'commerce' , ex:'In case of Commerce queries, should contain commerce parameters'},
-  { sc: [{ id: 101}],key: 'usingDictionary', t: true, url: '', prop: 'dictionaryFieldContext', ex:'In case of Commerce queries, dictionary fields'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingSearchHub', t: true, m: true, url: '', prop: 'searchHub', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingTab', t: true, m: true, url: '', prop: 'tab', check: { test: vals => (vals['recommendation'] == undefined || vals['recommendation'] == '') }, value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingLocale', t: true, m: true, url: '', prop: 'locale', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingVisitorId', p: true, t: true, m: true, url: '', prop: 'visitorId', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'q', t: true, m: true, url: '', prop: 'q', value: { test: val => (val != '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'numberOfResults', t: true, m: false, url: '', prop: 'numberOfResults', value: { test: val => (val <= 10) }, ex:'<= 10' },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'aq', t: true, url: '', prop: 'aq', value: { test: val => (val != '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'cq', t: true, url: '', prop: 'cq', value: { test: val => (val != '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'dq', t: true, url: '', prop: 'dq', value: { test: val => (val == '') }, ex:'Should be empty, use with caution'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'sortCriteria', t: true, url: '', prop: 'sortCriteria', value: { test: val => (val == 'relevancy' || val=='') }, ex:'Should be relevancy (default)'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingPipeline', t: true, url: '', prop: 'pipeline', value: { test: val => (val == '') }, ex:'Should be empty' },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'recommendation', t: true, url: '', prop: 'recommendation', value: { test: val => (val == '') }, ex:'Should be empty with normal search' },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingContext', t: true, url: '', prop: 'context', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'NOT_usingDQ', t: true, url: '', prop: 'dq', default: false, value: { test: val => (val == '') } ,ex:'Should be empty, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'NOT_usingLQ', t: true, url: '', prop: 'lq', default: false, value: { test: val => (val == '') } , ex:'Should be empty, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'NOT_usingFilterField', t: true, url: '', prop: 'filterField', default: false, value: { test: val => (val == '') } ,ex:'Should be false, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'NOT_usingPartialMatch', t: true, url: '', prop: 'partialMatch', default: false, value: { test: val => (val == false) } ,ex:'Should be false, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'partialMatchKeywords', t: true, url: '', prop: 'partialMatchKeywords', check: { test: vals => (vals['partialMatch'] == true) }, default: false, value: { test: val => (val == 3) } ,ex:'Should be 3, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'partialMatchThreshold', t: true, url: '', prop: 'partialMatchThreshold', check: { test: vals => (vals['partialMatch'] == true) }, default: false, value: { test: val => (val == '35%') } ,ex:'Should be 35%, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'enableQuerySyntax', t: true, url: '', prop: 'enableQuerySyntax', value: { test: val => (val == true) } ,ex:'Should be true'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'NOT_usingWildcards', t: true, url: '', prop: 'enableWildcards', default: false, value: { test: val => (val == false) } ,ex:'Should be false, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'NOT_usingDuplicateFilter', t: true, url: '', prop: 'enableDuplicateFiltering', default: false, value: { test: val => (val == false) } ,ex:'Should be false, decreases performance'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingCommerce', t: true, url: '', prop: 'commerce' , ex:'In case of Commerce queries, should contain commerce parameters'},
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],key: 'usingDictionary', t: true, url: '', prop: 'dictionaryFieldContext', ex:'In case of Commerce queries, dictionary fields'}
 ];
 
 //For QuerySuggest
 let qsChecks = [
-  { sc: [{ id: 101}], key: 'usingSearchHubQS', t: true, m: true, url: '', prop: 'searchHub', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'usingVisitorIdQS', p: true, t: true, m: true, url: '', prop: 'visitorId', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'usingTabQS', t: true, url: '', prop: 'tab', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'usingPipelineQS', t: true, url: '', prop: 'pipeline', value: { test: val => (val == '') } , ex:'Should be empty'},
-  { sc: [{ id: 101}],key: 'usingContextQS', t: true, url: '', prop: 'context', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],key: 'usingLocaleQS', t: true, url: '', prop: 'locale', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3}], key: 'usingSearchHubQS', t: true, m: true, url: '', prop: 'searchHub', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3}],key: 'usingVisitorIdQS', p: true, t: true, m: true, url: '', prop: 'visitorId', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3}],key: 'usingTabQS', t: true, url: '', prop: 'tab', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3}],key: 'usingQQS', t: true, m: true, url: '', prop: 'q', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3}],key: 'usingPipelineQS', t: true, url: '', prop: 'pipeline', value: { test: val => (val == '') } , ex:'Should be empty'},
+  { sc: [{ id: 101},{ id: 3}],key: 'usingContextQS', t: true, url: '', prop: 'context', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3}],key: 'usingLocaleQS', t: true, url: '', prop: 'locale', value: { test: val => (val !== '') } },
 ];
 
 //For ECommerce
 //make sure you always start with pa or t, then set first to true
 let ecChecks = [
   //t=pageview
-  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, first:true, m: true, key: 'tpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 't', value: { test: val => (val == 'pageview') }, ex:'pageview' },
-  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, p: true, key: 'cidpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
-  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, key: 'dlpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+' },
+  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'},{ id: 2, ectitle:'pageview'},{ id: 21, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, first:true, m: true, key: 'tpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 't', value: { test: val => (val == 'pageview') }, ex:'pageview' },
+  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'},{ id: 2, ectitle:'pageview'},{ id: 21, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, p: true, key: 'cidpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
+  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'},{ id: 2, ectitle:'pageview'},{ id: 21, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, key: 'dlpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+' },
   { ectitle: {test: vals => (vals['t'])}, m: false, key: 'dtpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'dt', value: { test: val => (val !== '') } },
-  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, p: true, pp: true, key: 'pidpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, key: 'cupv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'cu', value: { test: val => (val !== '') } },
+  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'},{ id: 2, ectitle:'pageview'},{ id: 21, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, p: true, pp: true, key: 'pidpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 1, ectitle:'pageview'},{ id: 16, ectitle:'pageview'},{ id: 2, ectitle:'pageview'},{ id: 21, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: true, key: 'cupv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'cu', value: { test: val => (val !== '') } },
   { ectitle: {test: vals => (vals['t'])}, m: false, key: 'ulpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'ul', value: { test: val => (val !== '') } },
-  { sc: [{ id: 1, ectitle:'pageview', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 16, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: false, key: 'uidpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'uid', value: { test: val => (val !== '') }},
+  { sc: [{ id: 1, ectitle:'pageview', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 16, ectitle:'pageview'},{ id: 2, ectitle:'pageview'},{ id: 21, ectitle:'pageview'}], ectitle: {test: vals => (vals['t'])}, m: false, key: 'uidpv', url: '/collect', check: { test: vals => (['pageview'].includes(vals['t'])) }, prop: 'uid', value: { test: val => (val !== '') }},
   //t=event ==> does not needs to be added, is a check with pa etc.
   //impression il1pi1id exists
   { sc: [{ id: 11, ectitle:'impression'}], ectitle: {test: vals => ('impression')}, first:true, m: true, key: 'tim', url: '/collect', check: { test: vals => (['event'].includes(vals['t']) && vals['il1pi1id']) }, prop: 't', value: { test: val => (val == 'event') } ,ex:'event'},
@@ -209,90 +255,90 @@ let ecChecks = [
   { sc: [{ id: 11, ectitle:'impression' }], ectitle: {test: vals => ('impression')}, m: true, key: 'IL1PI1PSim', url: '/collect', check: { test: vals => (['event'].includes(vals['t']) && vals['il1pi1id']) }, prop: 'il1pi1ps', value: { test: val => (val == 1 ? true : false) }, ex:'Integer == 1'},
   { sc: [{ id: 11, ectitle:'impression' }], ectitle: {test: vals => ('impression')}, m: true, key: 'IL1PI1QTim', url: '/collect', check: { test: vals => (['event'].includes(vals['t']) && vals['il1pi1id']) }, prop: 'il1pi1qt', value: { test: val => (val == '' ? true : false) }, ex:'Empty/undefined'},
   //pa=add
-  { sc: [{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'ta', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') }, ex:'event' },
-  { sc: [{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
-  { sc: [{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dla', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
-  { sc: [{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pida', url: '/collect', check: { test: vals =>(['add'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) },ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cua', url: '/collect', check: { test: vals => (['add'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
-  { sc: [{ id: 13, ectitle:'add', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
-  { sc: [{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'paa', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'add') }, ex:'add'},
-  { sc: [{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pala', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val.match(/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1ida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
-  { sc: [{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1bra', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
-  { sc: [{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nma', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
-  { sc: [{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1caa', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
-  { sc: [{ id: 13, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 15, ectitle:'add', value: { test: val => (val==2)}, ex:'Integer == 2'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1psa', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1ps', value: { test: val => (val >0) }, ex:'Integer > 0'},
-  { sc: [{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1pra', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
-  { sc: [{ id: 13, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1'},{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1qta', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val>0) }, ex:'Integer > 0'},
-  { sc: [{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr2ida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add'},{ id: 25, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'ta', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') }, ex:'event' },
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add'},{ id: 25, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add'},{ id: 25, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dla', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add'},{ id: 25, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pida', url: '/collect', check: { test: vals =>(['add'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) },ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add'},{ id: 25, ectitle:'add'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cua', url: '/collect', check: { test: vals => (['add'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
+  { sc: [{ id: 41, ectitle:'add', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 32, ectitle:'add', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add' },{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'paa', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'add') }, ex:'add'},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add' },{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pala', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val.match(/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add' },{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1ida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add' },{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1bra', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add' },{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nma', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add' },{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1caa', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
+  { sc: [{ id: 41, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 32, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 34, ectitle:'add', value: { test: val => (val==12)},ex:'Integer == 12' }, { id: 13, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 15, ectitle:'add', value: { test: val => (val==2)}, ex:'Integer == 2'},{ id: 21, ectitle:'add', value: { test: val => (val==1)}},{ id: 23, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 25, ectitle:'add', value: { test: val => (val==2)}, ex:'Integer == 2'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1psa', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1ps', value: { test: val => (val >0) }, ex:'Integer > 0'},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add'},{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1pra', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
+  { sc: [{ id: 41, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 32, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1'},{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add', value: { test: val => (val==1)}},{ id: 23, ectitle:'add', value: { test: val => (val==1)}, ex:'Integer == 1'},{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1qta', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val>0) }, ex:'Integer > 0'},
+  { sc: [{ id: 41, ectitle:'add'},{ id: 32, ectitle:'add'},{ id: 34, ectitle:'add'},{ id: 13, ectitle:'add' },{ id: 15, ectitle:'add'},{ id: 21, ectitle:'add'},{ id: 23, ectitle:'add'},{ id: 25, ectitle:'add'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr2ida', url: '/collect', check: { test: vals => (['add'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
 
   //pa=remove
-  { sc: [{ id: 23, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'tr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') }, ex:'event' },
-  { sc: [{ id: 23, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cidr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) },ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
-  { sc: [{ id: 23, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dlr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
-  { sc: [{ id: 23, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pidr', url: '/collect', check: { test: vals =>(['remove'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 23, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cur', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
-  { sc: [{ id: 23, ectitle:'remove', value: { test: val => (val == '') }, ex:'Empty/undefined'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uidr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'remove' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'par', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'remove') },ex:'remove'},
-  { sc: [{ id: 23, ectitle:'remove' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'palr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val == 'checkout') }, ex:'checkout'},
-  { sc: [{ id: 23, ectitle:'remove' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1idr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'remove' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1brr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'remove' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nmr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'remove' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1car', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1prr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
-  { sc: [{ id: 23, ectitle:'remove', value: { test: val => (val==1)}, ex:'Integer == 1'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1qtr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val>0) }, ex:'Integer > 0'},
-  { sc: [{ id: 23, ectitle:'remove' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr2idr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
+  { sc: [{ id: 43, ectitle:'remove'},{ id: 42, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'tr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') }, ex:'event' },
+  { sc: [{ id: 43, ectitle:'remove'},{ id: 42, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cidr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) },ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
+  { sc: [{ id: 43, ectitle:'remove'},{ id: 42, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dlr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
+  { sc: [{ id: 43, ectitle:'remove'},{ id: 42, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pidr', url: '/collect', check: { test: vals =>(['remove'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 43, ectitle:'remove'},{ id: 42, ectitle:'remove'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cur', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
+  { sc: [{ id: 43, ectitle:'remove', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 42, ectitle:'remove', value: { test: val => (val == '') }, ex:'Empty/undefined'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uidr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
+  { sc: [{ id: 43, ectitle:'remove' },{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'par', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'remove') },ex:'remove'},
+  { sc: [{ id: 43, ectitle:'remove' },{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'palr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val == 'checkout') }, ex:'checkout'},
+  { sc: [{ id: 43, ectitle:'remove' },{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1idr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
+  { sc: [{ id: 43, ectitle:'remove' },{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1brr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
+  { sc: [{ id: 43, ectitle:'remove' },{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nmr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
+  { sc: [{ id: 43, ectitle:'remove' },{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1car', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
+  { sc: [{ id: 43, ectitle:'remove'},{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1prr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
+  { sc: [{ id: 43, ectitle:'remove', value: { test: val => (val==1)}, ex:'Integer == 1'},{ id: 42, ectitle:'remove', value: { test: val => (val==1)}, ex:'Integer == 1'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1qtr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val>0) }, ex:'Integer > 0'},
+  { sc: [{ id: 43, ectitle:'remove' },{ id: 42, ectitle:'remove'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr2idr', url: '/collect', check: { test: vals => (['remove'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
 
   //pa=click or quickview
-  { sc: [{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle: {test: vals => ('click')}, first:true, m: true, key: 'tc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') } , ex:'event'},
-  { sc: [{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, p: true, key: 'cidc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
-  { sc: [{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, key: 'dlc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
-  { sc: [{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, p: true, pp: true, key: 'pidc', url: '/collect', check: { test: vals =>(['click','quickview'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, key: 'cuc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
-  { sc: [{ id: 12, ectitle:'click', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: false, key: 'uidc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click', value: { test: val => (val=='click')} }], ectitle:  {test: vals => ('click')}, m: true, key: 'pac', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'click' || val=='quickview') }, ex:'click or quickview'},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'palc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val.match(/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1idc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1brc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1nmc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1cac', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
-  { sc: [{ id: 12, ectitle:'click', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 14, ectitle:'click', value: { test: val => (val==2)}, ex:'Integer == 2'},{ id: 16, ectitle:'click', value: { test: val => (val==2)} }], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1psc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1ps', value: { test: val => (val >0) }, ex:'Integer > 0'},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1prc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
-  { sc: [{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1qtc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val=='') }, ex:'Empty/undefined'},
-  { sc: [{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr2idc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click'},{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle: {test: vals => ('click')}, first:true, m: true, key: 'tc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') } , ex:'event'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click'},{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, p: true, key: 'cidc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click'},{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, key: 'dlc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click'},{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, p: true, pp: true, key: 'pidc', url: '/collect', check: { test: vals =>(['click','quickview'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click'},{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle: {test: vals => ('click')}, m: true, key: 'cuc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
+  { sc: [{ id: 31, ectitle:'click', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click', value: { test: val => (val == '') }, ex:'Empty/undefined'},{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: false, key: 'uidc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
+  { sc: [{ id: 31, ectitle:'click' },{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click', value: { test: val => (val=='click')} },{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click', value: { test: val => (val=='click')} },{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click', value: { test: val => (val=='click')} }], ectitle:  {test: vals => ('click')}, m: true, key: 'pac', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'click' || val=='quickview') }, ex:'click or quickview'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'palc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val.match(/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1idc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1brc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1nmc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1cac', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
+  { sc: [{ id: 31, ectitle:'click', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 33, ectitle:'click', value: { test: val => (val==12)}, ex:'Integer == 12'},{ id: 35, ectitle:'click', value: { test: val => (val==12)}, ex:'Integer == 12' },{ id: 12, ectitle:'click', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 14, ectitle:'click', value: { test: val => (val==2)}, ex:'Integer == 2'},{ id: 16, ectitle:'click', value: { test: val => (val==2)} },{ id: 22, ectitle:'click', value: { test: val => (val==1)}, ex:'Integer == 1' },{ id: 24, ectitle:'click', value: { test: val => (val==2)}, ex:'Integer == 2'},{ id: 26, ectitle:'click', value: { test: val => (val==2)} }], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1psc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1ps', value: { test: val => (val >0) }, ex:'Integer > 0'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1prc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click'},{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr1qtc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val=='') }, ex:'Empty/undefined'},
+  { sc: [{ id: 31, ectitle:'click'},{ id: 33, ectitle:'click'},{ id: 35, ectitle:'click'},{ id: 12, ectitle:'click' },{ id: 14, ectitle:'click'},{ id: 16, ectitle:'click'},{ id: 22, ectitle:'click' },{ id: 24, ectitle:'click'},{ id: 26, ectitle:'click'}], ectitle:  {test: vals => ('click')}, m: true, key: 'pr2idc', url: '/collect', check: { test: vals => (['click','quickview'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
 
   //pa=detail
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'td', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event' || val == 'pageview') }, ex:'event OR pageview' },
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cidd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dld', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pidd', url: '/collect', check: { test: vals =>(['detail'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cud', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uidd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pad', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'detail') }, ex:'detail'},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pald', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val.match(/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1idd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1brd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nmd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1cad', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1prd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
-  { sc: [{ id: 16, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr2idd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'td', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event' || val == 'pageview') }, ex:'event OR pageview' },
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cidd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dld', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pidd', url: '/collect', check: { test: vals =>(['detail'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cud', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uidd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pad', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'detail') }, ex:'detail'},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pald', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val.match(/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^coveo:search:[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1idd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1brd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nmd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1cad', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1prd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
+  { sc: [{ id: 26, ectitle:'detail'},{ id: 16, ectitle:'detail'},{ id: 2, ectitle:'detail'},{ id: 21, ectitle:'detail'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr2idd', url: '/collect', check: { test: vals => (['detail'].includes(vals['pa'])) }, prop: 'pr2id', value: { test: val => (val == '') }, ex:'Empty/undefined'},
 
   //pa=purchase
   //pa=checkout
-  { sc: [{ id: 23, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'tp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') }, ex:'event' },
-  { sc: [{ id: 23, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cidp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
-  { sc: [{ id: 23, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dlp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
-  { sc: [{ id: 23, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pidp', url: '/collect', check: { test: vals =>(['purchase'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) },ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
-  { sc: [{ id: 23, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cup', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
-  { sc: [{ id: 23, ectitle:'purchase', value: { test: val => (val == '') }, ex:'Empty/undefined'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uidp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pap', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'purchase') }, ex:'purchase'},
-  { sc: [{ id: 23, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'palp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val=='') },ex:'Empty/undefined'},
-  { sc: [{ id: 23, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1idp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1brp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nmp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1cap', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
-  { sc: [{ id: 23, ectitle:'purchase'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1prp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
-  { sc: [{ id: 23, ectitle:'purchase', value: { test: val => (val==1)}, ex:'Integer == 1'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1qtp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val>0) }, ex:'Integer > 0'}
+  { sc: [{ id: 44, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, first:true, m: true, key: 'tp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 't', value: { test: val => (val == 'event') }, ex:'event' },
+  { sc: [{ id: 44, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, key: 'cidp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'cid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) }, ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/' },
+  { sc: [{ id: 44, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'dlp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'dl', value: { test: val => (val.match(/^https?:\/\/.+/i) ? true : false) }, ex:'/^https?:\/\/.+/' },
+  { sc: [{ id: 44, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, p: true, pp: true, key: 'pidp', url: '/collect', check: { test: vals =>(['purchase'].includes(vals['pa'])) }, prop: 'pid', value: { test: val => (val.match(/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/i) ? true : false) },ex:'/^[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}/'},
+  { sc: [{ id: 44, ectitle:'purchase'}], ectitle: {test: vals => (vals['pa'])}, m: true, key: 'cup', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa']))}, prop: 'cu', value: { test: val => (val !== '') } },
+  { sc: [{ id: 44, ectitle:'purchase', value: { test: val => (val == '') }, ex:'Empty/undefined'}], ectitle:  {test: vals => (vals['pa'])}, m: false, key: 'uidp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'uid', value: { test: val => (val !== '') }},
+  { sc: [{ id: 44, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pap', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pa', value: { test: val => (val == 'purchase') }, ex:'purchase'},
+  { sc: [{ id: 44, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'palp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pal', value: { test: val => (val=='') },ex:'Empty/undefined'},
+  { sc: [{ id: 44, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1idp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1id', value: { test: val => (val !== '') }},
+  { sc: [{ id: 44, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1brp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1br', value: { test: val => (val !== '') }},
+  { sc: [{ id: 44, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1nmp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1nm', value: { test: val => (val !== '') }},
+  { sc: [{ id: 44, ectitle:'purchase' }], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1cap', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1ca', value: { test: val => (val !== '') }},
+  { sc: [{ id: 44, ectitle:'purchase'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1prp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1pr', value: { test: val => (val.match(/^\d+(\.\d+)?$/) ? true : false) }, ex:'/^\d+(\.\d+)?$/'},
+  { sc: [{ id: 44, ectitle:'purchase', value: { test: val => (val>=1)}, ex:'Integer >= 1'}], ectitle:  {test: vals => (vals['pa'])}, m: true, key: 'pr1qtp', url: '/collect', check: { test: vals => (['purchase'].includes(vals['pa'])) }, prop: 'pr1qt', value: { test: val => (val>0) }, ex:'Integer > 0'}
 
 
 ];
@@ -301,50 +347,50 @@ let ecChecks = [
 //For Analytics
 let analyticChecks = [
 
-  { title: 'Click/Open', t: true, m: true, p: true, key: 'usingVisitorA', url: '/click', prop: 'visitor', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'actionCause', url: '/click', prop: 'actionCause', value: { test: val => (val == 'documentquickview' || val == 'documentopen' || val == 'recommendationopen') } },
-  { title: 'Click/Open', t: true, m: true, key: 'documentUri', url: '/click', prop: 'documentUri', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'documentPosition', url: '/click', prop: 'documentPosition', value: { test: val => (val >= 1) }, ex:'Integer >=1' },
-  { title: 'Click/Open', t: true, m: true, key: 'documentUri', url: '/click', prop: 'documentUri', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'documentUrl', url: '/click', prop: 'documentUrl', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'documentTitle', url: '/click', prop: 'documentTitle', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'documentUriHash', url: '/click', prop: 'documentUriHash', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'language', url: '/click', prop: 'language', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'searchQueryUid', url: '/click', prop: 'searchQueryUid', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'sourceName', url: '/click', prop: 'sourceName', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, m: true, key: 'contentIdKey', url: '/click', prop: 'customData/contentIdKey', value: { test: val => (val == 'permanentid') } , ex:'permanentid'},
-  { title: 'Click/Open', t: true, m: true, key: 'contentIdValue', url: '/click', prop: 'customData/contentIdValue', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, key: 'userAgent', m: true, url: '/click', prop: 'userAgent', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, key: 'outcome', url: '/click', prop: 'outcome', value: { test: val => (val !== '') } },
-  { title: 'Click/Open', t: true, key: 'rankingModifier', url: '/click', prop: 'rankingModifier', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, p: true, key: 'usingVisitorA', url: '/click', prop: 'visitor', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'actionCause', url: '/click', prop: 'actionCause', value: { test: val => (val == 'documentquickview' || val == 'documentopen' || val == 'recommendationopen') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'documentUri', url: '/click', prop: 'documentUri', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'documentPosition', url: '/click', prop: 'documentPosition', value: { test: val => (val >= 1) }, ex:'Integer >=1' },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'documentUri', url: '/click', prop: 'documentUri', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'documentUrl', url: '/click', prop: 'documentUrl', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'documentTitle', url: '/click', prop: 'documentTitle', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'documentUriHash', url: '/click', prop: 'documentUriHash', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'language', url: '/click', prop: 'language', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'searchQueryUid', url: '/click', prop: 'searchQueryUid', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'sourceName', url: '/click', prop: 'sourceName', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'contentIdKey', url: '/click', prop: 'customData/contentIdKey', value: { test: val => (val == 'permanentid') } , ex:'permanentid'},
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, m: true, key: 'contentIdValue', url: '/click', prop: 'customData/contentIdValue', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, key: 'userAgent', m: true, url: '/click', prop: 'userAgent', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, key: 'outcome', url: '/click', prop: 'outcome', value: { test: val => (val !== '') } },
+  { sc: [{ id: 36},{ id: 102}],title: 'Click/Open', t: true, key: 'rankingModifier', url: '/click', prop: 'rankingModifier', value: { test: val => (val !== '') } },
 
   { title: 'PageView', t: true, key: 'pageViews_new', url: '/collect', prop: 't', value: 'pageview', ex:'pageview' },
-  { sc: [{ id: 10}], title: 'PageView', t: true, m: true, key: 'location', url: '/view', prop: 'location', value: { test: val => (val !== '') } },
-  { sc: [{ id: 10}], title: 'PageView', t: true, m: true, key: 'pageViews_contentIdKey', url: '/view', prop: 'contentIdKey', value: { test: val => (val !== '') } },
-  { sc: [{ id: 10}], title: 'PageView', t: true, m: true, key: 'pageViews_contentIdValue', url: '/view', prop: 'contentIdValue', value: { test: val => (val !== '') } },
-  { sc: [{ id: 10}], title: 'PageView', t: true, m: true, key: 'pageViews_language', url: '/view', prop: 'language', value: { test: val => (val !== '') } },
-  { sc: [{ id: 10}], title: 'PageView', t: true, key: 'outcomeP', url: '/view', prop: 'outcome', value: { test: val => (val !== '') } },
-  { sc: [{ id: 10}], title: 'PageView', t: true, p: true, key: 'usingVisitorAP', m: false, url: '/view', prop: 'visitor', value: { test: val => (val !== '') } },
+  { sc: [{ id: 10},{ id: 102}], title: 'PageView', t: true, m: true, key: 'location', url: '/view', prop: 'location', value: { test: val => (val !== '') } },
+  { sc: [{ id: 10},{ id: 102}], title: 'PageView', t: true, m: true, key: 'pageViews_contentIdKey', url: '/view', prop: 'contentIdKey', value: { test: val => (val !== '') } },
+  { sc: [{ id: 10},{ id: 102}], title: 'PageView', t: true, m: true, key: 'pageViews_contentIdValue', url: '/view', prop: 'contentIdValue', value: { test: val => (val !== '') } },
+  { sc: [{ id: 10},{ id: 102}], title: 'PageView', t: true, m: true, key: 'pageViews_language', url: '/view', prop: 'language', value: { test: val => (val !== '') } },
+  { sc: [{ id: 10},{ id: 102}], title: 'PageView', t: true, key: 'outcomeP', url: '/view', prop: 'outcome', value: { test: val => (val !== '') } },
+  { sc: [{ id: 10},{ id: 102}], title: 'PageView', t: true, p: true, key: 'usingVisitorAP', m: false, url: '/view', prop: 'visitor', value: { test: val => (val !== '') } },
 
 
-  { sc: [{ id: 101}],title: 'Search', t: true, m: true, key: 'usingSearchHubA', url: '/search', prop: 'originLevel1', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'usingTabA', m: true, url: '/search', prop: 'originLevel2', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, m: true, key: 'usingSearchHubA', url: '/search', prop: 'originLevel1', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingTabA', m: true, url: '/search', prop: 'originLevel2', value: { test: val => (val !== '') } },
   { title: 'Search', t: true, key: 'actionCauseS', m: true, url: '/search', prop: 'actionCause', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'usingLocaleA', m: true, url: '/search', prop: 'language', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, p: true, key: 'usingVisitorAS', m: true, url: '/search', prop: 'visitor', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'queryText', m: true, url: '/search', prop: 'queryText', check: { test: vals => ((vals['recommendation'] != '' && vals['recommendation'] != undefined) || (vals['actionCause'] != 'interfaceLoad' && vals['actionCause'] != 'recommendationInterfaceLoad' && vals['actionCause'] != 'recommendation')) }, value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'userAgentA', m: true, url: '/search', prop: 'userAgent', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'searchQueryUidA', m: true, url: '/search', prop: 'searchQueryUid', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'advancedQuery', url: '/search', prop: 'advancedQuery', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'usingLevel3', url: '/search', prop: 'originLevel3', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'usingPipelineA', url: '/search', prop: 'queryPipeline', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'outcomeS', url: '/search', prop: 'outcome', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingLocaleA', m: true, url: '/search', prop: 'language', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, p: true, key: 'usingVisitorAS', m: true, url: '/search', prop: 'visitor', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'queryText', m: true, url: '/search', prop: 'queryText', check: { test: vals => ((vals['recommendation'] != '' && vals['recommendation'] != undefined) || (vals['actionCause'] != 'interfaceLoad' && vals['actionCause'] != 'recommendationInterfaceLoad' && vals['actionCause'] != 'recommendation')) }, value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'userAgentA', m: true, url: '/search', prop: 'userAgent', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'searchQueryUidA', m: true, url: '/search', prop: 'searchQueryUid', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'advancedQuery', url: '/search', prop: 'advancedQuery', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingLevel3', url: '/search', prop: 'originLevel3', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingPipelineA', url: '/search', prop: 'queryPipeline', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'outcomeS', url: '/search', prop: 'outcome', value: { test: val => (val !== '') } },
   //{ title: 'Search', t: true, key: 'NOT_visitorChanged', url: '/search', prop: 'NOT visitorChanged', def: true, value: true },
-  { sc: [{ id: 101}],title: 'Search', t: true, key: 'responseTime', url: '/search', prop: 'responseTime', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'responseTime', url: '/search', prop: 'responseTime', value: { test: val => (val > 0) }, ex:'Integer > 0' },
   { title: 'Search', t: false, key: 'interfaceLoad', url: '/search', prop: 'actionCause', value: { test: val => (val == 'interfaceload' || val == 'recommendationinterfaceload') } },
   { title: 'Search', t: false, key: 'interfaceChange', url: '/search', prop: 'actionCause', value: { test: val => (val == 'interfacechange') } },
   { title: 'Search', t: false, key: 'searchBoxSubmit', url: '/search', prop: 'actionCause', value: { test: val => (val == 'searchboxsubmit') } },
-  { sc: [{ id: 101}],title: 'Search', t: false, key: 'searchFromLink', url: '/search', prop: 'actionCause', value: { test: val => (val == 'searchfromlink') } },
+  { sc: [{ id: 101},{ id: 3}],title: 'Search', t: false, key: 'searchFromLink', url: '/search', prop: 'actionCause', value: { test: val => (val == 'searchfromlink') } },
   { title: 'Search', t: false, key: 'searchBoxClear', url: '/search', prop: 'actionCause', value: { test: val => (val == 'searchboxclear') } },
   { title: 'Search', t: false, key: 'omniboxAnalytics', url: '/search', prop: 'actionCause', value: { test: val => (val == 'omniboxanalytics') } },
   { title: 'Search', t: false, key: 'omniboxFromLink', url: '/search', prop: 'actionCause', value: { test: val => (val == 'omniboxfromLink') } },
@@ -366,7 +412,7 @@ let analyticChecks = [
   { title: 'Custom', t: true, m: true, key: 'language', url: '/custom', prop: 'language', value: { test: val => (val !== '') } },
   { title: 'Custom', t: false, key: 'facetSearch', url: '/custom', prop: 'eventValue', value: { test: val => (val == 'facetsearch') } },
   { title: 'Custom', t: false, key: 'facetUpdateSort', url: '/custom', prop: 'eventValue', value: { test: val => (val == 'facetupdatesort') } },
-  { title: 'Custom', t: false, key: 'getMoreResults', url: '/custom', prop: 'eventType', value: { test: val => (val == 'getmoreresults') } },
+  { sc: [{ id: 33}],title: 'Custom', t: false, key: 'getMoreResults', url: '/custom', prop: 'eventType', value: { test: val => (val == 'getmoreresults') } },
 
 ];
 
@@ -405,7 +451,8 @@ let resetState = (tabId) => {
       analyticReport: '',
       analyticInd: true,
       ecReport: '',
-      ecInd: true
+      ecInd: true,
+      visitor: ''
     };
     let state = STATES[tabId];
     //Add global state
@@ -636,7 +683,7 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
       if (currentResponse != '') {
         rec.statusCode = currentResponse;
       }
-      if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
+      if (state.devconnection != '' && senttodev && content.content != '') state.devconnection.postMessage(rec);
       if (content.content != '')
         state.dev.unshift(rec);
   
@@ -648,7 +695,7 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
     if (currentResponse != '') {
       rec.statusCode = currentResponse;
     }
-    if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
+    if (state.devconnection != '' && senttodev && content.content != '') state.devconnection.postMessage(rec);
     if (content.content != '')
       state.dev.unshift(rec);
   }
@@ -790,8 +837,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         content.oneisbad = false;
         //Check if we have searchToken or analyticsToken
 
-        content.content = `<li class='${(state['searchToken']!=undefined) ? "validInd" : "notvalidInd"} notmandatory' style='width: auto !important;'>searchToken<span class='propvalue'><pre class='code'>${state['searchToken']}</pre></span></li>`;
-        content.content += `<li class='${(state['analyticsToken']!=undefined) ? "validInd" : "notvalidInd"} notmandatory' style='width: auto !important;'>analyticsToken<span class='propvalue'><pre class='code'>${state['analyticsToken']}</pre></span></li>`;
+        content.content = `<li class='${(state['searchToken']!=undefined) ? "validInd" : "notvalidInd"} notmandatory' style='width: auto !important;'><span class='proptitle'>searchToken</span><span class='propvalue'><pre class='code'>${state['searchToken']}</pre></span></li>`;
+        content.content += `<li class='${(state['analyticsToken']!=undefined) ? "validInd" : "notvalidInd"} notmandatory' style='width: auto !important;'><span class='proptitle'>analyticsToken</span><span class='propvalue'><pre class='code'>${state['analyticsToken']}</pre></span></li>`;
         let rec = { type: 'NAV', statusCode: 200, time: getTime(), req: '1', data: content, request: { type: 'Navigated to new Page', url: msg.url, data: {} } };
         if (state.enabledSearch) {
           state.dev.unshift(rec);
@@ -817,10 +864,20 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         Object.assign(posted, events);
         console.log('POST: BEACON READY TO SENT ' + currentRequestId);
         console.log('POST: BEACONdata ' + msg.data);
-
+        //check if we have a visitor in state
+        if (state.visitor!='') {
+          console.log(`Visitor from Cookie: ${state.visitor} found.`);
+          if (state.visitor!='') {
+            posted['visitor'] = state.visitor;
+          }
+        }
         if (msg.url.indexOf('/collect') == -1) {
           state.analyticRequests.unshift({ url: msg.url });
-          executeChecks(getTime(), currentRequestId, 'Analytics (beacon)', msg.url, posted, state, analyticChecks, state.scenario.analyticChecks, false, 'analyticReport', 'analyticInd', true);
+          let type='';
+          if (posted['actionCause']!=undefined) {
+            type += ' - '+posted['actionCause'];
+          }
+          executeChecks(getTime(), currentRequestId, 'Analytics'+type+' (beacon)', msg.url, posted, state, analyticChecks, state.scenario.analyticChecks, false, 'analyticReport', 'analyticInd', true);
           //not now, later when response is received if (state.devconnection!='') state.devconnection.postMessage(rec);
         } else {
           executeChecks(getTime(), currentRequestId, 'E Commerce (beacon)', msg.url, posted, state, ecChecks, state.scenario.ecChecks, false, 'ecReport', 'ecInd', true);
@@ -833,7 +890,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     return true;
   }
   if (msg.action == "append") {
-    //Do not record CoveoResponseChecker controls
+    //Do not record CoveoRequestChecker controls
     getTabId_Then(tabId => {
       getState_Then(state => {
         if (msg.obj.info == undefined) {
@@ -841,7 +898,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           state.recempty = false;
 
         } else {
-          if (msg.obj.info.id.indexOf('CoveoResponseChecker') == -1 && msg.obj.info.selector.indexOf('CoveoResponseChecker') == -1) {
+          if (msg.obj.info.id.indexOf('CoveoRequestChecker') == -1 && msg.obj.info.selector.indexOf('CoveoRequestChecker') == -1) {
 
             state.record[state.record.length] = msg.obj;
             state.recempty = false;
@@ -1102,17 +1159,17 @@ function checkToken(token) {
 chrome.tabs.onUpdated.addListener(function (tabId, info) {
   activeTabId = tabId;
   if (info.status === 'loading') {
-    let state = getState(tabId);
+    /*let state = getState(tabId);
     let document_url = (info.url || '').replace(/(#|\?).+/g, ''); // ignore after ?, url is updated when using facets or doing searches.
     // if we change location, we want to reset this tab state.
     if (document_url && state.document_url !== document_url) {
       //WIM This creates a conflict, overriding initSearchSuggest etc
       //resetState(tabId);
       //saveState({ 'document_url': document_url }, tabId);
-    }
+    }*/
   }
   else if (info.status === 'complete') {
-    saveState({ ready: true }, tabId);
+    //saveState({ ready: true }, tabId);
     getState_Then(state => {
       let msg = {
         type: "enabled",
@@ -1129,6 +1186,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, info) {
 let decodeRaw = function (raw) {
   let rawString = '';
   if (raw && raw.length) {
+    /*rawString = raw.map(function(data) {
+      return decodeURIComponent(String.fromCharCode.apply(null, new Uint8Array(data.bytes)));
+    }).join('');*/
+    rawString = decodeURIComponent(new TextDecoder('utf-8').decode(raw[0].bytes));
+    /*    
     try {
       let totalLen = 0;
       let aUint8 = raw.map(r => {
@@ -1147,16 +1209,20 @@ let decodeRaw = function (raw) {
     }
     catch (e) {
       console.error('decodeRaw Error: ', e);
-    }
+    }*/
   }
 
   return (rawString || '');
 };
 
 function getParameterCaseInsensitive(object, key) {
-  return object[Object.keys(object)
-    .find(k => k.toLowerCase() === key.toLowerCase())
-  ];
+  let found=undefined;
+  found=object[Object.keys(object).filter(function(k) {
+    //console.log(k+'==>'+key);
+    //if (k.toLowerCase() == key.toLowerCase()) console.log('EQUAL');
+    return k.toLowerCase() == key.toLowerCase();
+  })[0]];
+  return found;
 }
 
 let getData = function (raw, formData, events) {
@@ -1263,14 +1329,18 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
         parent = check.prop.split('/')[0];
       }
       if (parent != '') {
-        if (getParameterCaseInsensitive(postedString, parent)) {
+        if (getParameterCaseInsensitive(postedString, parent)!=undefined) {
           let nested = postedString[parent];
-          if (getParameterCaseInsensitive(nested, prop)) {
+          if (getParameterCaseInsensitive(nested, prop)!=undefined) {
             value = getParameterCaseInsensitive(nested, prop);
 
             if (typeof value === 'string' || value instanceof String) {
               value = value.toLowerCase();
 
+            }
+            //Check if object
+            if (typeof value === 'object') {
+              value = JSON.stringify(value);
             }
             curvalue = value;
             //check.lastValue = value;
@@ -1280,11 +1350,15 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
         }
 
       } else {
-        if (getParameterCaseInsensitive(postedString, check.prop)) {
+        if (getParameterCaseInsensitive(postedString, check.prop)!=undefined) {
           value = getParameterCaseInsensitive(postedString, check.prop);
           if (typeof value === 'string' || value instanceof String) {
             value = value.toLowerCase();
 
+          }
+           //Check if object
+           if (typeof value === 'object') {
+            value = JSON.stringify(value);
           }
           curvalue = value;
           //if (saveit) state.checks[check.key] = value;
@@ -1370,7 +1444,7 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
             if (state.persistent[persistentkey] == '') {
               state.persistent[persistentkey] = value;
             }
-            if (state.persistent[persistentkey] != value) {
+            if (state.persistent[persistentkey] != value && value!='') {
               persist = false;
               persistent = `Value should be persistent ${pages}<br>Old: ${state.persistent[persistentkey]}<br>New: ${value}`;
               //Saving current value
@@ -1457,7 +1531,7 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
             }
           }
           wehavedata = true;
-          curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'>${check.prop}${translatedProp}<span class='propvalue'>${curvalue}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
+          curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'><span class='proptitle'>${check.prop}${translatedProp}</span><span class='propvalue'>${curvalue}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
           if (!isValid && mandatory && saveit) oneisbad = true;
           if (!isValidSingle && mandatory) oneisbadSingle = true;
         }
@@ -1493,7 +1567,7 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
       }
 
       if (saveit) content += `<tr><td class='${(isValid && persistent == '') ? "valid" : "notvalid"}${mandatory ? " " : " notmandatory"}'></td><td>${ctitle}${translatedProp}</td><td>${value}<span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</td></tr>`;
-      if (check.t && go) curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'>${check.prop}${translatedProp}<span class='propvalue'>${curvalue}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
+      if (check.t && go) curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'><span class='proptitle'>${check.prop}${translatedProp}</span><span class='propvalue'>${curvalue}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
       //curcontentfordev += `<li class='${isValidSingle?"validInd":"notvalidInd"}${mandatory?" ":" notmandatory"}'>${ctitle} (${value})</li>`;
 
     } /*else {
@@ -1534,6 +1608,13 @@ function getURLParams(url) {
     result[key] = value;
   }
   return result;
+}
+
+function getCookies(url, callback) {
+  chrome.cookies.get({'url': url, 'name': 'visitor'}, function (cookie) {
+    var visitor = cookie && cookie.value ? cookie.value : null;
+    callback(visitor);
+  });
 }
 
 let onSearchRequest = function (details) {
@@ -1743,6 +1824,8 @@ let onAnalyticsRequest = function (details) {
       return;
       //update dev list in chrome devtools
     }
+    //getCookies(details.url, visitorCookie => {
+
     let thisState = {};
     let events = {};
     events = getURLParams(details.url);
@@ -1835,6 +1918,20 @@ let onAnalyticsRequest = function (details) {
         eventsU['visitor'] = visitor;
       }
     }
+    //check if we have a visitor in state
+    if (visitor == null && state.visitor!='') {
+      console.log(`Visitor from Cookie: ${state.visitor} found.`);
+      if (state.visitor!='') {
+        eventsU['visitor'] = state.visitor;
+      }
+    }
+    /*if (visitorCookie!=null) {
+      console.log(`VisitorCookie: ${visitorCookie} found.`);
+      if (visitorCookie) {
+        eventsU['visitor'] = visitorCookie;
+      }
+
+    }*/
     //Assign eventsU to the normal events
     Object.assign(events, eventsU);
     console.log("CATCHED Analytics ", details.url);
@@ -1855,7 +1952,11 @@ let onAnalyticsRequest = function (details) {
     let postedString = getData(raw, formData, events);
     if (details.url.indexOf('/collect') == -1) {
       state.analyticRequests.unshift({ url: details.url });
-      executeChecks(getTime(), details.requestId, 'Analytics', details.url, postedString, state, analyticChecks, state.scenario.analyticChecks, false, 'analyticReport', 'analyticInd', true);
+      let type='';
+      if (postedString['actionCause']!=undefined) {
+        type += ' - '+postedString['actionCause'];
+      }
+      executeChecks(getTime(), details.requestId, 'Analytics'+type, details.url, postedString, state, analyticChecks, state.scenario.analyticChecks, false, 'analyticReport', 'analyticInd', true);
     } else {
       let type = 'E Commerce';
       let google = false;
@@ -1905,6 +2006,7 @@ let onAnalyticsRequest = function (details) {
     saveState(thisState, state.tabId);
     sendUpdate(state);
   });
+//});
   return { cancel: false };
 };
 
@@ -1922,6 +2024,35 @@ let getAuthorizationToken = function (requestHeaders) {
   return token;
 };
 
+function getCookie(cookie,cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
+let getVisitor = function (requestHeaders) {
+  let visitor = null, headers = requestHeaders || [];
+
+  for (let i = 0; i < headers.length; ++i) {
+    let header = headers[i];
+    if (header.name.toLowerCase() === 'cookie') {
+      visitor = getCookie(header.value,'visitor');
+      break;
+    }
+  }
+  return visitor;
+};
+
 let sendUpdate = function (state) {
   if (state.enabled) {
     addEcResults(state);
@@ -1936,6 +2067,16 @@ let sendUpdate = function (state) {
 
 let saveToken = function (tokenName, details) {
   getState_Then(state => {
+    //We also need to take the visitor from the cookie
+    let visitor = '';
+    if (state.visitor=='') {
+      let s = {};
+      visitor = getVisitor(details.requestHeaders);
+      if (visitor!='' && visitor!=null) {
+        s['visitor'] = visitor;
+        saveState(s, state.tabId);
+      }
+    }
     //First check URL
     let token = '';
     let url = details.url + "& ";
@@ -1966,19 +2107,51 @@ let saveToken = function (tokenName, details) {
   });
 };
 
-chrome.webRequest.onBeforeRequest.addListener(onSearchRequest, FILTER_SEARCH, ['blocking', 'requestBody']);
-chrome.webRequest.onBeforeRequest.addListener(onAnalyticsRequest, FILTER_ANALYTICS, ['blocking', 'requestBody']);
-chrome.webRequest.onCompleted.addListener(onAnalyticsRequest, FILTER_ANALYTICS, ['responseHeaders']);
-chrome.webRequest.onCompleted.addListener(onSearchRequest, FILTER_SEARCH, ['responseHeaders']);
+function addAllListeners(){
+  //check if listener is already there
+  if(chrome.webRequest.onBeforeRequest.hasListener(onSearchRequest)){
+    return;
+  }
+  chrome.webRequest.onBeforeRequest.addListener(onSearchRequest, FILTER_SEARCH, ['blocking', 'requestBody',"extraHeaders"]);
+  chrome.webRequest.onBeforeRequest.addListener(onAnalyticsRequest, FILTER_ANALYTICS, ['blocking', 'requestBody',"extraHeaders"]);
+  chrome.webRequest.onCompleted.addListener(onAnalyticsRequest, FILTER_ANALYTICS, ['responseHeaders']);
+  chrome.webRequest.onCompleted.addListener(onSearchRequest, FILTER_SEARCH, ['responseHeaders']);
+  chrome.webRequest.onSendHeaders.addListener(
+    saveToken.bind(null, 'searchToken'),
+    FILTER_SEARCH,
+    ["requestHeaders","extraHeaders"]);
+  
+  //for analytic tokens
+  chrome.webRequest.onSendHeaders.addListener(
+    saveToken.bind(null, 'analyticsToken'),
+    FILTER_ANALYTICS,
+    ["requestHeaders","extraHeaders"]);
+  
+}
+
+function removeAllListeners() {
+  if(chrome.webRequest.onBeforeRequest.hasListener(onSearchRequest)){
+    
+  chrome.webRequest.onBeforeRequest.removeListener(onSearchRequest);
+  chrome.webRequest.onBeforeRequest.removeListener(onAnalyticsRequest);
+  chrome.webRequest.onCompleted.removeListener(onAnalyticsRequest);
+  chrome.webRequest.onCompleted.removeListener(onSearchRequest);
+  chrome.webRequest.onSendHeaders.removeListener(saveToken.bind(null, 'searchToken'));
+  chrome.webRequest.onSendHeaders.removeListener(saveToken.bind(null, 'analyticsToken'));
+  }
+}
+
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   activeTabId = activeInfo.tabId;
   getState_Then(state => {
     if (state.enabledSearch) {
+      addAllListeners();
       chrome.browserAction.setIcon({ path: './images/80 B rounded square.png' })
       chrome.browserAction.setBadgeText({ text: 'REC' })
 
     } else {
+      removeAllListeners();
       chrome.browserAction.setIcon({ path: './images/80 B rounded square.png' })
       chrome.browserAction.setBadgeText({ text: ' ❚❚' })
 
@@ -2001,10 +2174,12 @@ function setEnabledSearch(enabled) {
     enabledSearch: enabled,
   });
   if (enabled) {
+    addAllListeners();
     chrome.browserAction.setIcon({ path: './images/80 B rounded square.png' })
     chrome.browserAction.setBadgeText({ text: 'REC' })
 
   } else {
+    removeAllListeners();
     chrome.browserAction.setIcon({ path: './images/80 B rounded square.png' })
     chrome.browserAction.setBadgeText({ text: ' ❚❚' })
 
@@ -2012,16 +2187,6 @@ function setEnabledSearch(enabled) {
 }
 
 //for Search tokens
-chrome.webRequest.onSendHeaders.addListener(
-  saveToken.bind(null, 'searchToken'),
-  FILTER_SEARCH,
-  ["requestHeaders"]);
-
-//for analytic tokens
-chrome.webRequest.onSendHeaders.addListener(
-  saveToken.bind(null, 'analyticsToken'),
-  FILTER_ANALYTICS,
-  ["requestHeaders"]);
 
 chrome.browserAction.onClicked.addListener(function (tab) {
   getState_Then(state => {
@@ -2051,6 +2216,7 @@ chrome.runtime.onMessage.addListener(
   return true;
 }*/
 );
+
 
 
 chrome.runtime.onConnect.addListener(function (devToolsConnection) {

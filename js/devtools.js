@@ -1,1 +1,1 @@
-chrome.devtools.panels.create("Coveo Response Checker", '/images/coveo.png', "devpanel.html", null);
+chrome.devtools.panels.create("Coveo Request Checker", '/images/coveo.png', "devpanel.html", null);

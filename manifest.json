@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "Coveo Response Checker",
+  "name": "Coveo Request Checker",
   "short_name": "coveo-response-checker",
-  "version": "1.2",
-  "description": "A Chrome extension to check the responses sent to the Coveo Organization.",
+  "version": "1.32",
+  "description": "A Chrome extension to check the requests sent to the Coveo Organization.",
   "icons": {
     "16": "images/80 B rounded square.png",
     "48": "images/120 B rounded square.png",
