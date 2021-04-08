@@ -381,9 +381,9 @@ let analyticChecks = [
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'queryText', m: true, url: '/search', prop: 'queryText', check: { test: vals => ((vals['recommendation'] != '' && vals['recommendation'] != undefined) || (vals['actionCause'] != 'interfaceLoad' && vals['actionCause'] != 'recommendationInterfaceLoad' && vals['actionCause'] != 'recommendation')) }, value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'userAgentA', m: true, url: '/search', prop: 'userAgent', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'searchQueryUidA', m: true, url: '/search', prop: 'searchQueryUid', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingPipelineA', m:true, url: '/search', prop: 'queryPipeline', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'advancedQuery', url: '/search', prop: 'advancedQuery', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingLevel3', url: '/search', prop: 'originLevel3', value: { test: val => (val !== '') } },
-  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingPipelineA', url: '/search', prop: 'queryPipeline', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'outcomeS', url: '/search', prop: 'outcome', value: { test: val => (val !== '') } },
   //{ title: 'Search', t: true, key: 'NOT_visitorChanged', url: '/search', prop: 'NOT visitorChanged', def: true, value: true },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'responseTime', url: '/search', prop: 'responseTime', value: { test: val => (val > 0) }, ex:'Integer > 0' },
@@ -704,7 +704,7 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
     let contents = doChecks(posted, url, sc_checks, state, report, reportInd, google, true);
     if (Array.isArray(contents)) {
       contents.map((key)=> {
-        let rec = { sc: true, type: type, time: time, req: reqId, data: key, request: { type: type + ' - For Scenario', url: url, data: posted } };
+        let rec = { sc: true, type: type, time: time, req: reqId+'sc', data: key, request: { type: type + ' - For Scenario', url: url, data: posted } };
         //Check if we have currentResponse, that means the onCompleted was already executed
         if (currentResponse != '') {
           rec.statusCode = currentResponse;
@@ -716,13 +716,13 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
       });
        
     } else {
-    let recs = { sc: true, type: type, time: time, req: reqId, data: contents, request: { type: type + ' - For Scenario', url: url, data: posted } };
+    let recs = { sc: true, type: type, time: time, req: reqId+'sc', data: contents, request: { type: type + ' - For Scenario', url: url, data: posted } };
     //Check if we have currentResponse, that means the onCompleted was already executed
     if (currentResponse != '') {
       recs.statusCode = currentResponse;
     }
     if (state.devconnection != '' && senttodev) state.devconnection.postMessage(recs);
-    if (contents.content != '')
+    //if (contents.content != '')
       state.dev.unshift(recs);
   }
   }
@@ -1015,7 +1015,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
           content.content = '';
           //Do we need to reset the values?
           resetPersistentValuesScenario(state, state.scenarioId);
-          let rec = { type: 'SCENARIO', statusCode: 200, time: getTime(), req: '', data: content, request: { type: 'Scenario Selected: ' + msg.scenarioId, url: '', data: {} } };
+          let rec = { type: 'SCENARIO', statusCode: 200, time: getTime(), req: 'Sc'+state.scenarioId, data: content, request: { type: 'Scenario Selected: ' + msg.scenarioId, url: '', data: {} } };
           state.dev.unshift(rec);
           if (state.devconnection != '') state.devconnection.postMessage(rec);
 
@@ -1642,7 +1642,11 @@ let onSearchRequest = function (details) {
         if (state.dev[i].request.url == details.url && state.dev[i].req == req) {
           state.dev[i].statusCode = details.statusCode;
           if (state.devconnection != '') state.devconnection.postMessage({one: state.dev[i]});
-          break;
+        }
+        //Scenario check
+        if (state.dev[i].request.url == details.url && state.dev[i].req == req+'sc') {
+          state.dev[i].statusCode = details.statusCode;
+          if (state.devconnection != '') state.devconnection.postMessage({one: state.dev[i]});
         }
       }
       saveState(state, state.tabId);
@@ -1808,6 +1812,14 @@ let onAnalyticsRequest = function (details) {
       for (let i = 0; i < state.dev.length; ++i) {
 
         if (state.dev[i].request.url == details.url && state.dev[i].req == req) {
+          state.dev[i].statusCode = details.statusCode;
+          found = true;
+          if (state.devconnection != '') state.devconnection.postMessage({one:state.dev[i]});
+          //there could be more with the same requestid
+          //break;
+        }
+        //Scenario
+        if (state.dev[i].request.url == details.url && state.dev[i].req == req+'sc') {
           state.dev[i].statusCode = details.statusCode;
           found = true;
           if (state.devconnection != '') state.devconnection.postMessage({one:state.dev[i]});

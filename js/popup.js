@@ -256,6 +256,9 @@ span.url{
   padding-top: 0px;
   overflow: auto;
 }
+.copy-section {
+  display: none;
+}
 ul {
   font-size:1.1em;
   font-weight: bold;
@@ -269,6 +272,12 @@ li {
   padding-right: 15px;
   padding-bottom: 10px;
 
+}
+ul.item {
+  font-size: 1em;
+    font-weight: normal;
+    margin-left: 0px;
+    margin-top: 0px;
 }
 details.code:focus {
   outline: none !important;

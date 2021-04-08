@@ -97,6 +97,12 @@ ul {
   margin-left: 25px;
   margin-top: 10px;
 }
+ul.item {
+  font-size: 1em;
+    font-weight: normal;
+    margin-left: 0px;
+    margin-top: 0px;
+}
 li {
   font-size: 0.9em;
   font-weight: normal;
@@ -536,10 +542,14 @@ tr td.line-ttfb, tr th.line-ttfb {
 
 .copy-section {
   position: absolute;
-  right: 0;
+  left: 0;
   background-image: url(../images/copy.svg);
-  width: 42px;
-  height: 50px;
+  width: 38px;
+  height: 33px;
+  opacity: 0.2;
+}
+.copy-section:hover{
+  opacity: 0.9;
 }
 
 .valid-true td.line-result {
