@@ -31,3 +31,7 @@ See also the **HELP** inside the Popup window of the Extension.
 ## Dependencies
 
 Google Chrome or Chromium
+
+## Versions
+1.34 Added Request Id
+1.34 Fixed issues

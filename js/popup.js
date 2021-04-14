@@ -116,6 +116,10 @@ h2, .h2 {
   font-size: 20px;
   font-weight: bold;
 }
+.req{
+  font-size: 0.7em;
+  padding-left: 10px;
+}
   .popup-content {padding-left: 8px; padding-right: 8px; padding-top: 0px; overflow: auto;}
 
   .coveo-styleguide .collapsible .collapsible-header {background-position: left 20px center; display: flex; line-height: 50px;}

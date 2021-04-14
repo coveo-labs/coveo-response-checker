@@ -15,7 +15,10 @@ header.header {
   margin-top: 2px !important;
  padding: 8.5px 10px;
 }
-
+.req{
+  font-size: 0.7em;
+  padding-left: 10px;
+}
 .progress {
   position: relative;
   height: 13px;
@@ -539,12 +542,12 @@ tr td.line-ttfb, tr th.line-ttfb {
   height: 34px;
   border-color: transparent;
 }
-
 .copy-section {
-  position: absolute;
-  left: 0;
+  /* position: relative; */
+  display: inline;
+  float: left;
   background-image: url(../images/copy.svg);
-  width: 38px;
+  width: 23px;
   height: 33px;
   opacity: 0.2;
 }
