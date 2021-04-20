@@ -382,6 +382,7 @@ let analyticChecks = [
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'userAgentA', m: true, url: '/search', prop: 'userAgent', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'searchQueryUidA', m: true, url: '/search', prop: 'searchQueryUid', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingPipelineA', m:true, url: '/search', prop: 'queryPipeline', value: { test: val => (val !== '') } },
+  { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', key: 'numberOfResults', t: true, m: false, url: '', prop: 'numberOfResults', value: { test: val => (val <= 10) }, ex:'<= 10' },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'advancedQuery', url: '/search', prop: 'advancedQuery', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'usingLevel3', url: '/search', prop: 'originLevel3', value: { test: val => (val !== '') } },
   { sc: [{ id: 101},{ id: 3},{ id: 33}],title: 'Search', t: true, key: 'outcomeS', url: '/search', prop: 'outcome', value: { test: val => (val !== '') } },

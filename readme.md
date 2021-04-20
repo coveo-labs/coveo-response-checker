@@ -33,5 +33,6 @@ See also the **HELP** inside the Popup window of the Extension.
 Google Chrome or Chromium
 
 ## Versions
+1.35 Added NumberOfResults check on /searches
 1.34 Added Request Id
 1.34 Fixed issues
