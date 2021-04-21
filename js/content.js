@@ -47,14 +47,17 @@ let decodeRaw = function (raw) {
       //console.log(e.target.result);
       //console.log(decodeURIComponent(e.target.result));
       try {
-      var text = decodeURIComponent(e.target.result);
-      const regex = /^.*=/gm;
-      text = text.replace(regex,'');
-      //console.log(text);
-      var obj = JSON.parse(text);
-      window.postMessage({url:url, content:obj});
+        if (e.target!=undefined) {
+          var text = decodeURIComponent(e.target.result);
+          const regex = /^.*=/gm;
+          text = text.replace(regex,'');
+          //console.log(text);
+          var obj = JSON.parse(text);
+          window.postMessage({url:url, content:obj});
+        }
       } catch(e)
       {
+        //console.log(arguments[0]);
         console.error('beacon Error: ', e);
       }
     });
