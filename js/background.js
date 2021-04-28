@@ -21,7 +21,7 @@ const FILTER_ANALYTICS = { urls: ["https://*/*analytics*","https://*/*collect*",
 
 let getTabId_Then = (callback) => {
   this.getActiveTab((tabs) => {
-    callback(tabs.id);
+    callback(tabs);
   });
   /*chrome.tabs.query({ active: true, lastFocusedWindow: true}, (tabs) => {
     if (tabs.length>0){
@@ -684,8 +684,8 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
       if (currentResponse != '') {
         rec.statusCode = currentResponse;
       }
-      if (state.devconnection != '' && senttodev && content.content != '') state.devconnection.postMessage(rec);
-      if (content.content != '')
+      if (state.devconnection != '' && senttodev/* && content.content != ''*/) state.devconnection.postMessage(rec);
+      //if (content.content != '')
         state.dev.unshift(rec);
   
     });
@@ -711,7 +711,7 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
           rec.statusCode = currentResponse;
         }
         if (state.devconnection != '' && senttodev) state.devconnection.postMessage(rec);
-        if (content.content != '')
+        //if (content.content != '')
           state.dev.unshift(rec);
     
       });
@@ -1134,14 +1134,18 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
 function getActiveTab(callback) {
   chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-    var tab = tabs[0];
+    var tab = activeTabId;
+    if (tabs!=undefined && tabs.length>0) {
+      tab = tabs[0].id;
+    }
+    //var tab = tabs[0];
 
     if (tab) {
       callback(tab);
     } else {
       chrome.tabs.get(activeTabId, function (tab) {
         if (tab) {
-          callback(tab);
+          callback(tab.id);
         } else {
           console.log('No active tab identified.');
         }
@@ -1791,6 +1795,7 @@ let addEcResults = function (state) {
 
 let onAnalyticsRequest = function (details) {
   if (details.method == "OPTIONS") return;
+  if (details.type !="xmlhttprequest") return;
   //Weird errors remove them
   if (details.url.indexOf('googleanalytics-analytics.js') != -1) return;
   if (details.url.indexOf('https://collect') != -1) return;
@@ -1802,7 +1807,7 @@ let onAnalyticsRequest = function (details) {
   if (details.url.indexOf('fmt=js') !=-1) return;
   if (details.url.indexOf('/webevents/') !=-1) return;
   if (details.url.indexOf('visitor_id=') !=-1) return;
-  if (details.url.indexOf('aip=') !=-1) return;
+  //if (details.url.indexOf('aip=') !=-1) return;
   //We do not want to track Google GTM events were pa is not in there l&pa=detail&
   if ((details.url.startsWith('https://www.google-analytics') || details.url.startsWith('https://analytics.google.com/')) && details.url.indexOf('&pa=') == -1) return;
   getState_Then(state => {
