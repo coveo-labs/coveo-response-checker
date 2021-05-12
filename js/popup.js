@@ -72,13 +72,30 @@ function createReportHTML(title) {
     //line += `<span class=code style='cursor:pointer'" id=${id}>Data sent(click to show):<pre class='mycode' id=${idc}>${JSON.stringify(message.request.data,null,2)}</pre></span>`;
     line += `<span class='url ${statusok}'><a href='${encodeURI(currentState.dev[i].request.url)}' target='_blank'>${currentState.dev[i].request.url}</a>${status}</span>`;
     line += `<details class=code>  <summary>Parameter validation</summary><ul>${currentState.dev[i].data.content}</ul></details>` + empty;
-    line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode'>${JSON.stringify(currentState.dev[i].request.data, null, 2)}</pre></details>`;
+    line += `<details class=code>  <summary>Post/Form Data</summary>  <pre class='mycode'>${sanitize(JSON.stringify(currentState.dev[i].request.data, null, 2))}</pre></details>`;
     //document.getElementById('ALL').innerHTML=line+document.getElementById('ALL').innerHTML;
     html += line;
   }
   return html;
 }
 
+
+function sanitize(string) {
+  const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  if (string.replace) {
+  return string.replace(reg, (match)=>(map[match]));
+  } else {
+    return string;
+  }
+}
 function getReportHTML() {
   let text = createReportHTML(myDownloadTitle);
   let title = myDownloadTitle;//$('#xProjectname').val();

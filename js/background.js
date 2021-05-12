@@ -674,6 +674,8 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
   if (state.scenarioId == '') {
     save = true;
   }
+  //clean posted
+  //posted = cleanPosted(posted);
   //First execute normal checks
   let content = doChecks(posted, url, checks, state, report, reportInd, google, save);
   //Check if we got back an array (in the case of EC)
@@ -1220,6 +1222,15 @@ let decodeRaw = function (raw) {
   return (rawString || '');
 };
 
+function cleanPosted(object) {
+  Object.keys(object).map(attr => {
+    if (typeof object[attr] === 'string' || object[attr] instanceof String) {
+      object[attr]=sanitize(object[attr]);
+    }
+  });
+  return object;
+}
+
 function getParameterCaseInsensitive(object, key) {
   let found=undefined;
   found=object[Object.keys(object).filter(function(k) {
@@ -1273,6 +1284,23 @@ let getData = function (raw, formData, events) {
     Object.assign(postedString, events);
   }
   return postedString;
+}
+
+function sanitize(string) {
+  const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  if (string.replace) {
+  return string.replace(reg, (match)=>(map[match]));
+  } else {
+    return string;
+  }
 }
 
 let doChecks = function (postedString, url, checks, state, report, reportindicator, google, saveit, initonly) {
@@ -1536,7 +1564,7 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
             }
           }
           wehavedata = true;
-          curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'><span class='proptitle'>${check.prop}${translatedProp}</span><span class='propvalue'>${curvalue}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
+          curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'><span class='proptitle'>${check.prop}${translatedProp}</span><span class='propvalue'>${sanitize(curvalue)}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
           if (!isValid && mandatory && saveit) oneisbad = true;
           if (!isValidSingle && mandatory) oneisbadSingle = true;
         }
@@ -1571,8 +1599,8 @@ let doChecks = function (postedString, url, checks, state, report, reportindicat
         //curcontent+= `<td class='${isValid?"valid":"notvalid"}${mandatory?" ":" notmandatory"}'></td><td>${check.key}</td><td>${value}${def_value==false?"(should be false or empty)":""}</td>`;   
       }
 
-      if (saveit) content += `<tr><td class='${(isValid && persistent == '') ? "valid" : "notvalid"}${mandatory ? " " : " notmandatory"}'></td><td>${ctitle}${translatedProp}</td><td>${value}<span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</td></tr>`;
-      if (check.t && go) curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'><span class='proptitle'>${check.prop}${translatedProp}</span><span class='propvalue'>${curvalue}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
+      if (saveit) content += `<tr><td class='${(isValid && persistent == '') ? "valid" : "notvalid"}${mandatory ? " " : " notmandatory"}'></td><td>${ctitle}${translatedProp}</td><td>${sanitize(value)}<span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</td></tr>`;
+      if (check.t && go) curcontentfordev += `<li class='${(isValidSingle && persistent == '') ? "validInd" : "notvalidInd"}${mandatory ? " " : " notmandatory"}'><span class='proptitle'>${check.prop}${translatedProp}</span><span class='propvalue'>${sanitize(curvalue)}</span><span class='propex'>${expected}</span>${(persistent == "") ? "" : `<span class=persistent>${persistent}</span>`}</li>`;
       //curcontentfordev += `<li class='${isValidSingle?"validInd":"notvalidInd"}${mandatory?" ":" notmandatory"}'>${ctitle} (${value})</li>`;
 
     } /*else {
