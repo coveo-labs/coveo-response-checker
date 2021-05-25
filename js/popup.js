@@ -535,13 +535,13 @@ let processData = (state) => {
   queries += `</table>`;
   document.getElementById('EC').innerHTML = queries;
 
-  let nightwatch = '';
+  /*let nightwatch = '';
   document.getElementById('Nightwatch').innerHTML = '';
   var dt = new NightwatchRenderer();
   dt.items = state.record;
   //Add the tests to the nightwatch file
   let tests = createTests(state);
-  document.getElementById('Nightwatch').innerHTML = dt.render(false, tests, false);
+  document.getElementById('Nightwatch').innerHTML = dt.render(false, tests, false);*/
   //Add the tests to the nightwatch file
 
   //document.getElementById('Nightwatch').innerHTML = nightwatch;
@@ -675,7 +675,7 @@ function reset() {
   $('#setScenario input').prop('checked', false);
   $('#setSearchTracker input').prop('checked', false);
   $('#recording').hide();
-  $('#copyNightwatch').hide();
+  //$('#copyNightwatch').hide();
   $('#loading').hide();
   $('#globalReport').hide();
   $('#scenario').hide();
@@ -704,7 +704,7 @@ function changeUI(enable, message = true) {
   if (enable) {
     $('#recording').show();
     $('#download-global').show();
-    $('#download-json').show();
+    //$('#download-json').show();
     $('#instructions').hide();
     $('#loading').hide();
     if (message) {
@@ -744,11 +744,11 @@ function toggleScenario() {
 
 }
 function fixTabs(current) {
-  if (current == 'NightwatchA') {
+  /*if (current == 'NightwatchA') {
     $('#copyNightwatch').show();
   } else {
     $('#copyNightwatch').hide();
-  }
+  }*/
   var tab_lists_anchors = document.querySelector("#tabbs").getElementsByTagName("a");
   var divs = document.querySelector("#tabbs").getElementsByClassName("tab-content");
   for (var i = 0; i < tab_lists_anchors.length; i++) {
@@ -798,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var manifestData = chrome.runtime.getManifest();
   $('#myTitle').text("Coveo Request Checker " + manifestData.version);
   $('#recording').hide();
-  $('#copyNightwatch').hide();
+  //$('#copyNightwatch').hide();
   $('#loading').hide();
   $('#globalReport').hide();
   $('#scenario').hide();
@@ -817,10 +817,10 @@ document.addEventListener('DOMContentLoaded', function () {
   $('#download-global').click(() => {
     downloadReport();
   });
-  $('#download-json').hide();
+  /*$('#download-json').hide();
   $('#download-json').click(() => {
     downloadReportJSON();
-  });
+  });*/
   $('#btnscenario').click((e) => {
     e.preventDefault();
     $('#setScenario input').prop('checked', $('#setScenario input').prop('checked') ? false : true);
@@ -829,7 +829,7 @@ document.addEventListener('DOMContentLoaded', function () {
   $('#showInstructions').click(() => {
     $('#instructions').toggle();
   });
-  $('#copyNightwatch').click((e) => {
+  /*$('#copyNightwatch').click((e) => {
     e.preventDefault();
 
     copyToClipboard(document.getElementById('NightwatchCode').innerText);
@@ -838,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function () {
       $('#clipboard-copied').addClass('mod-hidden');
     }, 999);
     return true;
-  });
+  });*/
 
   $('#getReport').click(getReport);
   $('#clear').click(() => {
