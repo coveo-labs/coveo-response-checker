@@ -684,6 +684,7 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
       let rec = { sc: false, type: type, time: time, req: reqId, data: key, request: { type: type, url: url, data: posted } };
       //Check if we have currentResponse, that means the onCompleted was already executed
       if (currentResponse != '') {
+        console.log("Current Response was NOT empty, setting statusCode");
         rec.statusCode = currentResponse;
       }
       if (state.devconnection != '' && senttodev/* && content.content != ''*/) state.devconnection.postMessage(rec);
@@ -696,6 +697,7 @@ function executeChecks(time, reqId, type, url, posted, state, checks, sc_checks,
     let rec = { sc: false, type: type, time: time, req: reqId, data: content, request: { type: type, url: url, data: posted } };
     //Check if we have currentResponse, that means the onCompleted was already executed
     if (currentResponse != '') {
+      console.log("Current Response was NOT empty, setting statusCode");
       rec.statusCode = currentResponse;
     }
     if (state.devconnection != '' && senttodev && content.content != '') state.devconnection.postMessage(rec);
@@ -865,8 +867,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         let events = {};
         events = getURLParams(msg.url);
         Object.assign(posted, events);
-        console.log('POST: BEACON READY TO SENT ' + currentRequestId);
-        console.log('POST: BEACONdata ' + msg.data);
+        console.log('POST: BEACON GOT, REQ: ' + currentRequestId);
+        console.log('POST: BEACON GOT, StatusCode: ' + currentResponse);
+        //console.log('POST: BEACONdata ' + msg.data);
         //check if we have a visitor in state
         if (state.visitor!='') {
           console.log(`Visitor from Cookie: ${state.visitor} found.`);
@@ -1823,7 +1826,13 @@ let addEcResults = function (state) {
 
 let onAnalyticsRequest = function (details) {
   if (details.method == "OPTIONS") return;
-  if (details.type !="xmlhttprequest") return;
+  let cont = false;
+  if (details.type=="ping" && details.method=="POST") {
+    cont = true;
+  }
+  if (!cont) {
+    if (details.type !="xmlhttprequest") return;
+  }
   //Weird errors remove them
   if (details.url.indexOf('googleanalytics-analytics.js') != -1) return;
   if (details.url.indexOf('https://collect') != -1) return;

@@ -275,11 +275,11 @@ let processData = (state) => {
   queries += `</table>`;
   document.getElementById('EC').innerHTML = queries;
 
-  let nightwatch = '';
+  /*let nightwatch = '';
   document.getElementById('Nightwatch').innerHTML = '';
   var dt = new NightwatchRenderer();
   dt.items = state.record;
-  document.getElementById('Nightwatch').innerHTML = dt.render(false);
+  document.getElementById('Nightwatch').innerHTML = dt.render(false);*/
   //document.getElementById('Nightwatch').innerHTML = nightwatch;
 }
 

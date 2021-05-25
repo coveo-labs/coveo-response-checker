@@ -1041,6 +1041,7 @@ TestRecorder.Recorder.prototype.log = function (text) {
   }
 };
 
+/*
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   //console.log(request.action);
   if (request.action == "start") {
@@ -1076,3 +1077,4 @@ chrome.runtime.onMessage.addListener(function (request, sender, response) {
   }
   return true;
 });
+*/
